@@ -18,6 +18,8 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
+from app.query_cache import CachedQueryEmbeddings
+
 load_dotenv()  # puts GOOGLE_API_KEY from .env into the environment
 
 # ---------------------------------------------------------------- settings ---
@@ -26,6 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = ROOT / "data" / "docs"
 CHROMA_DIR = ROOT / "chroma_db"
 COLLECTION = "papers"
+QUERY_CACHE = ROOT / "cache" / "query_embeddings.sqlite"
 
 # Newest stable Gemini embedding model. Unlike gemini-embedding-001, it still
 # returns unit-length vectors when shortened (checked 2026-10-21).
@@ -97,8 +100,9 @@ def get_vectorstore() -> Chroma:
     Retrieval imports this too, so chunks and questions are always embedded
     by the same model. Mismatched models give garbage with no error.
     """
-    embeddings = GoogleGenerativeAIEmbeddings(model=EMBED_MODEL,
-                                              output_dimensionality=EMBED_DIMS)
+    embeddings = CachedQueryEmbeddings(
+        GoogleGenerativeAIEmbeddings(model=EMBED_MODEL, output_dimensionality=EMBED_DIMS),
+        path=QUERY_CACHE, model_id=f"{EMBED_MODEL}@{EMBED_DIMS}")
     return Chroma(
         collection_name=COLLECTION,
         # Never omit this: without it Chroma silently downloads a local model.
@@ -115,6 +119,9 @@ def build_index() -> None:
     Deleting first is what stops a second run from storing every chunk twice.
     The corpus is frozen and small, so a full rebuild is simpler than tracking
     which chunks changed.
+
+    Cost: one embedding request PER CHUNK. 635 chunks use 635 of the free
+    tier's 1,000 requests per day, so don't rebuild casually.
     """
     shutil.rmtree(CHROMA_DIR, ignore_errors=True)
     pages = load_pages()

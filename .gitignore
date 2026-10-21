@@ -7,3 +7,5 @@ __pycache__/
 
 # Rebuilt from data/docs by `python -m app.ingest`
 chroma_db/
+# Question embeddings saved to spare the free-tier quota (app/query_cache.py)
+cache/
