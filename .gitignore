@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .env
 .ipynb_checkpoints/
+.pytest_cache/
 
 # Rebuilt from data/docs by `python -m app.ingest`
 chroma_db/

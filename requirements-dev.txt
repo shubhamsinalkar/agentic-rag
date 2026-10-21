@@ -1,0 +1,3 @@
+# Only for local development; Render installs requirements.txt alone.
+-r requirements.txt
+pytest==9.1.1
