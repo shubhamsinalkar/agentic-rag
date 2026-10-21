@@ -4,6 +4,7 @@ LangGraph merges the returned dict into the State. A small dict makes it
 obvious what each step is responsible for.
 
 Flow (wired in graph.py):
+    route -> (off_topic? generate : retrieve)
     retrieve -> grade -> (sufficient? generate : rewrite -> retrieve ...)
 """
 
@@ -15,6 +16,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
+from app import router
 from app.ingest import TOP_K, get_vectorstore
 from app.state import State
 
@@ -22,9 +24,13 @@ from app.state import State
 LLM_MODEL = "gemini-3.5-flash-lite"
 
 # The retry cap. Without it, a question the papers can't answer loops
-# forever, burning quota and never replying. 2 rewrites = at most 3 searches:
-# worst case 6 LLM calls (~5s), inside the 10s budget.
+# forever, burning quota and never replying. 2 rewrites = at most 3 searches
+# and 6 LLM calls: measured ~10s worst case, the edge of the 10s budget.
 MAX_REWRITES = 2
+
+# Comparison questions need evidence from two papers; with only 4 chunks,
+# one paper usually takes all the slots. 8 = room for ~4 per paper.
+COMPARISON_K = 2 * TOP_K
 
 IDK = "I don't know based on the provided documents."
 
@@ -35,8 +41,10 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages([
     ("system",
      "You answer questions about research papers using ONLY the numbered "
      "context blocks below. Cite the blocks you used like [1] or [2][3]. "
-     f"If the context does not contain the answer, reply exactly: \"{IDK}\" "
-     "Do not use outside knowledge."),
+     "An answer may need to combine several blocks, e.g. a comparison where "
+     "each method is described in a different block. "
+     f"If the blocks contain no information that answers the question, reply "
+     f"exactly: \"{IDK}\" Do not use outside knowledge."),
     ("human", "Context:\n\n{context}\n\nQuestion: {question}"),
 ])
 
@@ -45,8 +53,10 @@ GRADE_PROMPT = ChatPromptTemplate.from_messages([
      "You are a strict relevance grader for a question-answering system "
      "over research papers.\n"
      "1. For EACH numbered chunk, decide if it contains information that "
-     "directly helps answer the question. Being about the same paper or "
-     "topic is NOT enough: the chunk must contain facts the answer would use.\n"
+     "directly helps answer the question, or ANY PART of it: for a "
+     "comparison, a chunk covering just one side is relevant. Being about "
+     "the same paper or topic is NOT enough: the chunk must contain facts "
+     "the answer would use.\n"
      "2. Decide if the relevant chunks TOGETHER are sufficient to answer "
      "the question fully and specifically. If a detail the question asks "
      "for (a mechanism, condition, number, name) is absent, it is NOT "
@@ -134,6 +144,11 @@ def _cited_sources(answer: str, docs: list[Document]) -> list[str]:
 
 # ------------------------------------------------------------------- nodes ---
 
+def route(state: State) -> dict:
+    """Classify the question locally (~1 ms, no API call)."""
+    return {"route": router.predict(state["question"])}
+
+
 def retrieve(state: State) -> dict:
     """Search with the current query, skipping chunks already graded.
 
@@ -145,10 +160,11 @@ def retrieve(state: State) -> dict:
     add evidence, never lose it.
     """
     query = state.get("search_query") or state["question"]
+    k = COMPARISON_K if state.get("route") == "comparison" else TOP_K
     seen = set(state.get("seen_ids", []))
-    # Ask for extra results so TOP_K remain after removing seen ones.
-    hits = _vectorstore().similarity_search(query, k=TOP_K + len(seen))
-    new = [d for d in hits if d.id not in seen][:TOP_K]
+    # Ask for extra results so k remain after removing seen ones.
+    hits = _vectorstore().similarity_search(query, k=k + len(seen))
+    new = [d for d in hits if d.id not in seen][:k]
     return {
         "documents": state.get("documents", []) + new,
         "seen_ids": [*seen, *(d.id for d in new)],
@@ -202,7 +218,13 @@ def generate(state: State) -> dict:
     return {"answer": answer, "sources": _cited_sources(answer, docs)}
 
 
-# ------------------------------------------------------- conditional edge ---
+# ------------------------------------------------------ conditional edges ---
+
+def decide_after_route(state: State) -> str:
+    """Off-topic: skip search entirely. generate() sees no documents and
+    returns "I don't know" without any API call."""
+    return "generate" if state.get("route") == "off_topic" else "retrieve"
+
 
 def decide_after_grade(state: State) -> str:
     """The branch: answer now, or rewrite and search again?

@@ -1,3 +1,13 @@
 # Only for local development; Render installs requirements.txt alone.
 -r requirements.txt
 pytest==9.1.1
+
+# notebooks: analysis + charts
+pandas==3.0.6
+matplotlib==3.11.2
+seaborn==0.13.2
+
+# run notebooks headless so outputs get saved into the .ipynb
+ipykernel==7.4.0
+nbclient==0.11.0
+nbformat==5.11.1

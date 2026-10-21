@@ -1,5 +1,5 @@
-# Steps 1-2: ingestion, retrieval, minimal graph.
-# Later steps add fastapi, scikit-learn, pandas, etc.
+# What the running app needs. Notebook-only tools (pandas, charts,
+# jupyter) live in requirements-dev.txt to keep the Render image small.
 # Pinned so Render installs exactly what we tested locally.
 # Hard rule: nothing here may pull in torch (checked with `uv pip list`).
 
@@ -10,4 +10,7 @@ langchain-google-genai==4.4.2    # Gemini chat model + embeddings (free tier)
 langchain-chroma==1.1.0          # LangChain wrapper around ChromaDB
 httpx==0.28.1                    # HTTP client under google-genai; we catch its network errors
 langgraph==1.2.16                # step 2: the agent graph (state, nodes, edges)
+scikit-learn==1.9.1              # step 5: query router; MUST match the version
+                                 # router.pkl was trained with
+joblib==1.6.0                    # loads models/router.pkl
 python-dotenv==1.2.4           # loads GOOGLE_API_KEY from .env

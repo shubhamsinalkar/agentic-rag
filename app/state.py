@@ -14,7 +14,8 @@ from langchain_core.documents import Document
 
 class State(TypedDict, total=False):
     question: str               # the user's question, never changed
-    search_query: str           # what we search with; rewritten on retries
+    route: str                  # router: factual / conceptual / comparison / off_topic
+    search_query: str          # what we search with; rewritten on retries
     documents: list[Document]   # chunks to grade; after grade: relevant only
     seen_ids: list[str]         # every chunk already graded, so retries
                                 # look at NEW chunks instead of the same 4
@@ -23,4 +24,3 @@ class State(TypedDict, total=False):
     attempts: int               # rewrites done so far; caps the retry loop
     answer: str                 # written by generate
     sources: list[str]          # "paper.pdf p.N" for chunks the answer cites
-    # Added in step 5: route (question type from the sklearn router).

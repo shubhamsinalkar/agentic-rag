@@ -1,9 +1,11 @@
-"""The LangGraph wiring: self-correcting retrieval.
+"""The LangGraph wiring: routed, self-correcting retrieval.
 
-    START -> retrieve -> grade --sufficient--------------> generate -> END
-                ^          |
-                |          +--not sufficient (attempts < 2)--> rewrite
-                +-----------------------------------------------+
+    START -> route --off_topic-----------------------------> generate -> END
+               |                                               ^
+               +--> retrieve -> grade --sufficient-------------+
+                       ^          |
+                       |          +--not sufficient (attempts < 2)--> rewrite
+                       +-----------------------------------------------+
 
 Ask a question:  .venv\\Scripts\\python -m app.graph "your question"
 (prints every step, so you can watch the loop fire)
@@ -14,19 +16,23 @@ import time
 
 from langgraph.graph import END, START, StateGraph
 
-from app.nodes import decide_after_grade, generate, grade, retrieve, rewrite
+from app.nodes import (decide_after_grade, decide_after_route, generate, grade,
+                       retrieve, rewrite, route)
 from app.state import State
 
 
 def build_graph():
     graph = StateGraph(State)
 
+    graph.add_node("route", route)
     graph.add_node("retrieve", retrieve)
     graph.add_node("grade", grade)
     graph.add_node("rewrite", rewrite)
     graph.add_node("generate", generate)
 
-    graph.add_edge(START, "retrieve")
+    graph.add_edge(START, "route")
+    graph.add_conditional_edges("route", decide_after_route,
+                                ["retrieve", "generate"])
     graph.add_edge("retrieve", "grade")
     # The conditional edge: after grade, decide_after_grade(state) returns
     # the name of the next node. The list declares every possible target.
@@ -41,7 +47,7 @@ def build_graph():
 app = build_graph()
 
 # LangGraph's own backstop: it raises an error after this many steps. Our
-# MAX_REWRITES cap stops far earlier (at most 8 steps); this only catches a
+# MAX_REWRITES cap stops far earlier (at most 9 steps); this only catches a
 # bug in our own cap.
 RECURSION_LIMIT = 15
 
@@ -54,7 +60,9 @@ def ask(question: str) -> dict:
 
 def _show(node: str, update: dict) -> None:
     """One line per step, so the path through the graph is visible."""
-    if node == "retrieve":
+    if node == "route":
+        print(f"route     {update['route']}")
+    elif node == "retrieve":
         print(f"retrieve  query={update['search_query']!r}\n"
               f"          -> {len(update['documents'])} chunks to grade "
               f"({len(update['seen_ids'])} seen so far)")

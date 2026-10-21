@@ -1,0 +1,151 @@
+question,label
+"Which datasets does Self-RAG evaluate on?",factual
+"What beam width does Self-RAG use at the segment level?",factual
+"How many documents does Self-RAG retrieve per input by default?",factual
+"What learning rate was used to train the Adaptive-RAG classifier?",factual
+"Which GPU did the CRAG authors use for their experiments?",factual
+"How much memory does LLaMA-2 7B take during CRAG inference?",factual
+"What web search API does CRAG use?",factual
+"Who are the authors of the CRAG paper?",factual
+"Which university is the CRAG paper from?",factual
+"What year was the RAG paper published?",factual
+"What is the dimension of the document vectors in RAG's index?",factual
+"How many total values are stored in RAG's non-parametric memory?",factual
+"What beam size does RAG use for decoding?",factual
+"Which open-domain QA datasets does RAG report results on?",factual
+"What exact match score does RAG get on Natural Questions?",factual
+"What is the exact match of ReAct on HotpotQA?",factual
+"What accuracy does ReAct reach on FEVER?",factual
+"How many in-context examples does ReAct use for ALFWorld?",factual
+"Which models are evaluated in Lost in the Middle?",factual
+"What is the context length of LongChat-13B?",factual
+"How many documents are in the input context in the Lost in the Middle experiments?",factual
+"What is Claude-1.3's oracle accuracy in Lost in the Middle?",factual
+"Which retriever supplies documents in the Lost in the Middle experiments?",factual
+"What dataset is the multi-document QA task built from?",factual
+"How many key-value pairs are used in the synthetic retrieval task?",factual
+"Which LLMs does Adaptive-RAG test with?",factual
+"How many test samples per dataset does Adaptive-RAG use?",factual
+"What is the F1 score of Adaptive-RAG with GPT-3.5?",factual
+"Which base model does the Self-RAG critic use?",factual
+"How many reflection token types does Self-RAG define?",factual
+"what dataset size was used to train the critic in self-rag",factual
+"Name the benchmarks used in the ReAct paper",factual
+"Which optimizer is used to train the Adaptive-RAG classifier?",factual
+"What threshold values does CRAG use for its retrieval evaluator?",factual
+"Which version of SQuAD does Adaptive-RAG use?",factual
+"What does the acronym CRAG stand for?",factual
+"what is the full name of ReAct",factual
+"Which conference published the ReAct paper?",factual
+"How many CoT-SC samples are drawn in the ReAct experiments?",factual
+"What metric does Self-RAG report for PopQA?",factual
+"Which dataset is used to fine-tune CRAG's retrieval evaluator?",factual
+"How many retrieved documents does RAG use for Jeopardy question generation?",factual
+"What is GPT-3.5-Turbo's accuracy with 20 documents when the answer is in the middle?",factual
+"Which model rewrites queries for web search in CRAG?",factual
+"How many queries were annotated to train the Adaptive-RAG classifier?",factual
+"How does Self-RAG decide when to retrieve?",conceptual
+"Why does CRAG use web search?",conceptual
+"Explain the decompose-then-recompose algorithm in CRAG.",conceptual
+"How does knowledge refinement filter out irrelevant strips?",conceptual
+"Why is a lightweight evaluator preferred in CRAG?",conceptual
+"How does RAG marginalize over the retrieved documents?",conceptual
+"Explain how dense passage retrieval works in RAG.",conceptual
+"Why can RAG update its knowledge without retraining?",conceptual
+"What is index hot-swapping and why is it useful?",conceptual
+"How does ReAct combine reasoning and acting?",conceptual
+"Why does chain-of-thought hallucinate more than ReAct?",conceptual
+"How does ReAct recover from mistakes in its reasoning?",conceptual
+"Why do models do worse when relevant information is in the middle of the context?",conceptual
+"How does model architecture affect position bias in Lost in the Middle?",conceptual
+"Explain query-aware contextualization.",conceptual
+"Why don't extended-context models fix the lost in the middle problem?",conceptual
+"How does instruction fine-tuning affect the U-shaped curve?",conceptual
+"What is the purpose of the ISUSE token?",conceptual
+"How does Self-RAG use reflection tokens at inference time to rank outputs?",conceptual
+"Explain how the critic model is trained in Self-RAG.",conceptual
+"Why does Self-RAG train on passages interleaved with reflection tokens?",conceptual
+"How does Adaptive-RAG save time on simple questions?",conceptual
+"Why is multi-step retrieval inefficient for simple queries?",conceptual
+"How does the iterative approach answer complex multi-hop questions?",conceptual
+"What is the role of the query-complexity classifier?",conceptual
+"Why does retrieval sometimes hurt generation quality?",conceptual
+"How does CRAG handle ambiguous retrieval results?",conceptual
+"Explain the Correct action in CRAG",conceptual
+"Why does CRAG rewrite queries before searching the web?",conceptual
+"How does the retrieval evaluator compute a confidence score?",conceptual
+"Explain why RAG-Token can combine information from several documents.",conceptual
+"How is the RAG retriever trained without supervision on which document to retrieve?",conceptual
+"What causes retrieval collapse in RAG?",conceptual
+"How do the thoughts in ReAct help in decision-making tasks like ALFWorld?",conceptual
+"Why is ReAct more interpretable than acting alone?",conceptual
+"what problem does self-rag try to solve",conceptual
+"explain the motivation behind corrective retrieval augmented generation",conceptual
+"How does Self-RAG check that its output is supported by evidence?",conceptual
+"Why does adding more retrieved documents give diminishing returns?",conceptual
+"How does the position of the answer document change model accuracy?",conceptual
+"Describe how ReAct's action space limits its retrieval.",conceptual
+"Why does Adaptive-RAG label queries automatically instead of by hand?",conceptual
+"How does the generator in Self-RAG learn to predict reflection tokens?",conceptual
+"Why is BART a good fit as the generator in RAG?",conceptual
+"How does Self-RAG's critic make training cheaper than RLHF?",conceptual
+"Compare CRAG and RAG in how they use retrieved documents.",comparison
+"What is the difference between Self-RAG and CRAG?",comparison
+"ReAct vs chain-of-thought: which is more factual?",comparison
+"How does Adaptive-RAG differ from Self-RAG?",comparison
+"Compare single-step and multi-step retrieval approaches.",comparison
+"Which is better on HotpotQA, ReAct or CoT-SC?",comparison
+"Differences between RAG-Sequence and Self-RAG?",comparison
+"How do encoder-decoder and decoder-only models compare in Lost in the Middle?",comparison
+"Compare GPT-3.5-Turbo and Claude-1.3 on the multi-document QA task.",comparison
+"CRAG versus Self-RAG on PopQA performance",comparison
+"Contrast the retrievers used by CRAG and Adaptive-RAG.",comparison
+"How does ReAct's use of Wikipedia compare to RAG's?",comparison
+"Compare the critic in Self-RAG with the evaluator in CRAG.",comparison
+"Which needs more training, Self-RAG or CRAG?",comparison
+"What do CRAG and Adaptive-RAG have in common?",comparison
+"Compare how Lost in the Middle and Adaptive-RAG view retrieving more documents.",comparison
+"ReAct vs Act-only: how do the results differ?",comparison
+"Compare closed-book and oracle performance in Lost in the Middle.",comparison
+"How do RAG and REALM differ in updating the document encoder?",comparison
+"Compare extended-context models with their standard versions.",comparison
+"Which papers use T5 models and for what?",comparison
+"Both CRAG and Self-RAG critique retrieval: how are they similar and different?",comparison
+"Is Adaptive-RAG faster than Self-RAG?",comparison
+"Compare the datasets used by Self-RAG and CRAG.",comparison
+"difference between no-retrieval, single-step and multi-step approaches in adaptive rag",comparison
+"How does CRAG improve on Self-RAG?",comparison
+"Compare primacy bias and recency bias.",comparison
+"RAG vs purely parametric models: what does the RAG paper find?",comparison
+"Which handles irrelevant documents better, CRAG or standard RAG?",comparison
+"Compare the base LLMs used in Self-RAG, CRAG and Adaptive-RAG.",comparison
+"What is the capital of France?",off_topic
+"Who won the last cricket world cup?",off_topic
+"How do I make pancakes?",off_topic
+"What's the weather like in Mumbai today?",off_topic
+"Write a Python function to reverse a string.",off_topic
+"How do I center a div in CSS?",off_topic
+"What is the best phone to buy this year?",off_topic
+"Who is the prime minister of India?",off_topic
+"Recommend a good movie for tonight.",off_topic
+"How many calories are in a banana?",off_topic
+"Translate hello into Spanish.",off_topic
+"What is the stock price of Apple?",off_topic
+"How do convolutional neural networks work?",off_topic
+"What is LoRA fine-tuning?",off_topic
+"Explain gradient descent.",off_topic
+"How do I deploy a React app to Vercel?",off_topic
+"What is the speed of light?",off_topic
+"Tell me a joke.",off_topic
+"How do I fix a flat bicycle tire?",off_topic
+"What is the plot of Harry Potter?",off_topic
+"When was the Eiffel Tower built?",off_topic
+"How tall is Mount Everest?",off_topic
+"What are the symptoms of the flu?",off_topic
+"How do I learn to play guitar?",off_topic
+"What is Docker used for?",off_topic
+"Who painted the Mona Lisa?",off_topic
+"What is the difference between SQL and NoSQL?",off_topic
+"Compare iPhone and Android phones.",off_topic
+"How does photosynthesis work?",off_topic
+"Which programming language should I learn first?",off_topic

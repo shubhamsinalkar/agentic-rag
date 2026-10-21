@@ -71,6 +71,19 @@ def test_accepts_the_chunk_that_answers():
     assert [d.id for d in result["documents"]] == [answer_chunk[0].id]
 
 
+@needs_api
+def test_one_side_of_a_comparison_counts_as_relevant():
+    """Bug found in step 5: for "how does ReAct differ from RAG?", every
+    chunk covers only one side, and the grader used to reject them all."""
+    react_actions = _chunks({"source": "react.pdf"}, limit=1, contains="lookup[string]")
+    result = nodes.grade({
+        "question": "How does the way ReAct retrieves information differ from the way RAG retrieves it?",
+        "documents": react_actions,
+    })
+    assert [d.id for d in result["documents"]] == [react_actions[0].id]
+    assert result["sufficient"] is False  # the RAG side is still missing
+
+
 # ------------------------------------------------- retrieve (real search) ---
 
 @needs_api
