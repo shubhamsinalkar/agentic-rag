@@ -97,7 +97,7 @@ def _vectorstore():
 
 
 @lru_cache(maxsize=1)
-def _llm():
+def llm():
     # max_retries: the free tier answers some calls with 429/503; the client
     # backs off and retries instead of failing the whole question.
     return ChatGoogleGenerativeAI(model=LLM_MODEL, max_retries=3)
@@ -109,7 +109,7 @@ def _grader():
     # with_structured_output forces the reply into the Grading schema (JSON
     # validated by pydantic), so the code reads real booleans instead of
     # parsing free text like "Yes, mostly...".
-    return GRADE_PROMPT | _llm().with_structured_output(Grading)
+    return GRADE_PROMPT | llm().with_structured_output(Grading)
 
 
 # ----------------------------------------------------------------- helpers ---
@@ -185,7 +185,7 @@ def rewrite(state: State) -> dict:
         "search_query": state.get("search_query") or state["question"],
         "missing": state.get("missing") or "relevant information",
     })
-    new_query = _llm().invoke(messages).text.strip().strip('"')
+    new_query = llm().invoke(messages).text.strip().strip('"')
     return {"search_query": new_query,
             "attempts": state.get("attempts", 0) + 1}
 
@@ -198,7 +198,7 @@ def generate(state: State) -> dict:
         return {"answer": IDK, "sources": []}
     messages = ANSWER_PROMPT.invoke({"context": _format_context(docs),
                                      "question": state["question"]})
-    answer = _llm().invoke(messages).text
+    answer = llm().invoke(messages).text
     return {"answer": answer, "sources": _cited_sources(answer, docs)}
 
 
