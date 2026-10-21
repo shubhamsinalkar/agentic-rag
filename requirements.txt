@@ -1,0 +1,13 @@
+# Steps 1-2: ingestion, retrieval, minimal graph.
+# Later steps add fastapi, scikit-learn, pandas, etc.
+# Pinned so Render installs exactly what we tested locally.
+# Hard rule: nothing here may pull in torch (checked with `uv pip list`).
+
+pypdf==6.21.1                    # PDF -> text, one page at a time (our own loader;
+                                 # langchain-community is being retired)
+langchain-text-splitters==1.1.3
+langchain-google-genai==4.4.2    # Gemini chat model + embeddings (free tier)
+langchain-chroma==1.1.0          # LangChain wrapper around ChromaDB
+httpx==0.28.1                    # HTTP client under google-genai; we catch its network errors
+langgraph==1.2.16                # step 2: the agent graph (state, nodes, edges)
+python-dotenv==1.2.4           # loads GOOGLE_API_KEY from .env
