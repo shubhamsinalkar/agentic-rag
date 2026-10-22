@@ -25,9 +25,18 @@ def test_health(client):
     assert body["papers"] == 6
 
 
-def test_serves_the_demo_page(client):
+def test_serves_the_website_and_its_assets(client):
     r = client.get("/")
-    assert r.status_code == 200 and "<title>Agentic RAG</title>" in r.text
+    assert r.status_code == 200 and "<title>Agentic RAG" in r.text
+    # the built JS bundle referenced by index.html must be served too
+    js = r.text.split('src="')[1].split('"')[0]
+    assert js.startswith("/assets/") and client.get(js).status_code == 200
+    assert client.get("/favicon.svg").status_code == 200
+
+
+def test_api_routes_win_over_the_website(client):
+    assert client.get("/health").json()["status"] == "ok"
+    assert client.post("/ask", json={}).status_code == 422  # API, not a static 404/405
 
 
 @pytest.mark.parametrize("payload", [
@@ -45,6 +54,10 @@ def test_off_topic_question_end_to_end(client):
     assert body["answer"] == IDK
     assert body["route"] == "off_topic"
     assert body["sources"] == [] and body["retries"] == 0
+    # The trace shows the shortcut: classified, then answered, no search.
+    assert [s["step"] for s in body["steps"]] == ["route", "answer"]
+    assert body["steps"][0]["label"] == "off_topic"
+    assert body["citations"] == []
 
 
 def test_per_ip_rate_limit(client, monkeypatch):

@@ -198,6 +198,26 @@ def _cited_sources(answer: str, docs: list[Document]) -> list[str]:
     return list(dict.fromkeys(labels))
 
 
+# The whole chunk (chunks are at most CHUNK_SIZE = 1000 chars). A 600-char
+# cut once stopped right before the sentence that held the answer; the UI
+# highlights the matching sentences instead of guessing where to cut.
+QUOTE_CHARS = 1000
+
+
+def _citations(answer: str, docs: list[Document]) -> list[dict]:
+    """Each cited block [n] with the text it came from, so a reader can check
+    the answer against the paper (the web page shows these as quotes)."""
+    cited = dict.fromkeys(int(n) for n in re.findall(r"\[(\d+)\]", answer))
+    out = []
+    for n in cited:
+        if 1 <= n <= len(docs):
+            d = docs[n - 1]
+            text = " ".join(d.page_content.split())  # PDF line breaks -> spaces
+            out.append({"n": n, "source": d.metadata["source"], "page": d.metadata["page"],
+                        "text": text[:QUOTE_CHARS] + ("…" if len(text) > QUOTE_CHARS else "")})
+    return out
+
+
 # ------------------------------------------------------------------- nodes ---
 
 def route(state: State) -> dict:
@@ -267,11 +287,12 @@ def generate(state: State) -> dict:
     if not docs:
         # Nothing relevant survived grading: don't pay for an LLM call
         # that can only say "I don't know".
-        return {"answer": IDK, "sources": []}
+        return {"answer": IDK, "sources": [], "citations": []}
     messages = ANSWER_PROMPT.invoke({"context": _format_context(docs),
                                      "question": state["question"]})
     answer = llm().invoke(messages).text
-    return {"answer": answer, "sources": _cited_sources(answer, docs)}
+    return {"answer": answer, "sources": _cited_sources(answer, docs),
+            "citations": _citations(answer, docs)}
 
 
 # ------------------------------------------------------ conditional edges ---

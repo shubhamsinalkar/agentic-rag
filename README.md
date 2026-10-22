@@ -66,13 +66,25 @@ pip install -r requirements-dev.txt && python -m pytest                         
 
 ### API
 
-`POST /ask` with `{"question": "...", "strategy": "agentic_rag" | "plain_rag" | "cag"}` returns `{answer, sources, strategy, route, retries, latency_s}`. `GET /health` reports the index size. The public demo allows 5 questions per minute per visitor and 150 per day overall, to stay inside the free API quota.
+`POST /ask` with `{"question": "...", "strategy": "agentic_rag" | "plain_rag" | "cag"}` returns `{answer, sources, strategy, route, retries, latency_s, steps, citations}`. `steps` is what happened in order (route, search, check, rewrite, answer, each with its details and duration), and `citations` holds the passages behind each `[n]` in the answer.
+
+### Website
+
+The page at `/` is a React app (Vite, TypeScript, Tailwind, shadcn/ui) in `frontend/`. Its build output in `app/static/` is committed, so the server needs no Node.
+
+```bash
+cd frontend && pnpm install
+pnpm dev        # http://localhost:5173, calls the API on :8000 (run uvicorn too)
+pnpm build      # writes app/static/
+```
+
+It shows each answer next to the steps that produced it, draws corrections (a failed check, a rewritten search) in red, and quotes the cited passages with the sentences the answer used highlighted. `GET /health` reports the index size. The public demo allows 5 questions per minute per visitor and 150 per day overall, to stay inside the free API quota.
 
 ## Project layout
 
 ```
 app/
-  main.py          FastAPI: /ask, /health, demo page (static/index.html), rate limits
+  main.py          FastAPI: /ask, /health, rate limits; serves the built website (static/)
   graph.py         LangGraph wiring: nodes, edges, the conditional edges
   nodes.py         route, retrieve, grade, rewrite, generate + prompts
   state.py         the State passed between nodes
@@ -83,6 +95,7 @@ app/
   benchmark.py     run all questions x strategies; LLM-as-judge
   corpus.py        the 6 papers, pinned by arXiv version + SHA-256
   query_cache.py   question-embedding cache (saves free-tier quota)
+frontend/          React + shadcn/ui website source (built into app/static)
 notebooks/         01_router (train + evaluate), 02_benchmark (results + charts)
 data/              testset.json (30 Q&A), router_queries.csv (150 labels),
                    index/ (shipped vectors), benchmark/ (raw results)

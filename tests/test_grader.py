@@ -120,4 +120,4 @@ def test_decide_after_grade(sufficient, attempts, expected):
 
 def test_generate_skips_llm_when_nothing_relevant():
     result = nodes.generate({"question": CRAG_QUESTION, "documents": []})
-    assert result == {"answer": nodes.IDK, "sources": []}
+    assert result == {"answer": nodes.IDK, "sources": [], "citations": []}

@@ -12,11 +12,11 @@ from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
 from threading import Lock
-from typing import Literal
+from typing import Any, Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from google.genai.errors import ClientError, ServerError
 from pydantic import BaseModel, Field
 
@@ -88,6 +88,13 @@ class AskRequest(BaseModel):
     strategy: Literal["agentic_rag", "plain_rag", "cag"] = "agentic_rag"
 
 
+class Citation(BaseModel):
+    n: int          # the [n] marker used in the answer
+    source: str     # paper file name
+    page: int
+    text: str       # the passage the answer drew on (quoted, trimmed)
+
+
 class AskResponse(BaseModel):
     answer: str
     sources: list[str]
@@ -95,6 +102,10 @@ class AskResponse(BaseModel):
     route: str | None = None   # router's label (agentic strategy only)
     retries: int
     latency_s: float
+    # What happened, in order: route / search / check / rewrite / pick /
+    # answer, each with its own details and duration in ms.
+    steps: list[dict[str, Any]] = []
+    citations: list[Citation] = []
 
 
 def _client_ip(request: Request) -> str:
@@ -143,7 +154,8 @@ def ask(body: AskRequest, request: Request) -> AskResponse:
         raise HTTPException(500, "Something went wrong answering that question.") from err
     return AskResponse(answer=out["answer"], sources=out["sources"], strategy=body.strategy,
                        route=out.get("route"), retries=out["retries"],
-                       latency_s=round(time.perf_counter() - started, 2))
+                       latency_s=round(time.perf_counter() - started, 2),
+                       steps=out.get("steps", []), citations=out.get("citations", []))
 
 
 @app.get("/health")
@@ -153,6 +165,7 @@ def health() -> dict:
             "papers": len(list(DOCS_DIR.glob("*.pdf")))}
 
 
-@app.get("/", include_in_schema=False)
-def index() -> FileResponse:
-    return FileResponse(STATIC / "index.html")
+# The website: a React app built from frontend/ into app/static (built files
+# are committed, so the server needs no Node). Mounted last so /ask, /health
+# and /docs keep priority; html=True serves index.html at "/".
+app.mount("/", StaticFiles(directory=STATIC, html=True), name="site")

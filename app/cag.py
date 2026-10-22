@@ -98,7 +98,12 @@ def select_papers(question: str) -> list[str]:
 
 
 def answer(question: str) -> dict:
-    papers = select_papers(question)
+    return answer_from(question, select_papers(question))
+
+
+def answer_from(question: str, papers: list[str]) -> dict:
+    """Answer with the given papers in the prompt (split out so the API can
+    time and report the two steps separately)."""
     if not papers:
         return {"answer": IDK, "sources": [], "papers": []}
     # Papers first (stable, cacheable prefix), question last (changes).

@@ -1,0 +1,170 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/caveat";
+
+/* Dark mode follows the reader's system setting. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+/*
+  Design idea: a reviewer marking up a paper.
+  ink = text and structure, red pen = corrections (the rewrite loop, used
+  nowhere else), highlighter = evidence quoted from the papers.
+*/
+@theme inline {
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader Variable', ui-serif, Georgia, serif;
+  --font-hand: 'Caveat Variable', cursive;
+  --font-heading: var(--font-serif);
+
+  --color-pen: var(--pen);
+  --color-highlight: var(--highlight);
+  --color-paper: var(--paper);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  --paper: #f7f8fa;          /* cool white page */
+  --background: #f7f8fa;
+  --foreground: #16213a;     /* ink */
+  --card: #ffffff;           /* a sheet on the page */
+  --card-foreground: #16213a;
+  --popover: #ffffff;
+  --popover-foreground: #16213a;
+  --primary: #16213a;
+  --primary-foreground: #f7f8fa;
+  --secondary: #eceff4;
+  --secondary-foreground: #16213a;
+  --muted: #eceff4;
+  --muted-foreground: #5b6474; /* graphite */
+  --accent: #eceff4;
+  --accent-foreground: #16213a;
+  --destructive: #c8102e;
+  --border: #dde1e8;           /* rule */
+  --input: #cfd5df;
+  --ring: #16213a;
+  --pen: #c8102e;              /* red pen */
+  --highlight: #ffe766;        /* highlighter */
+  --radius: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* night reading: same roles, stepped for a dark surface */
+    --paper: #0f1524;
+    --background: #0f1524;
+    --foreground: #e7ebf3;
+    --card: #161e31;
+    --card-foreground: #e7ebf3;
+    --popover: #161e31;
+    --popover-foreground: #e7ebf3;
+    --primary: #e7ebf3;
+    --primary-foreground: #0f1524;
+    --secondary: #1f2940;
+    --secondary-foreground: #e7ebf3;
+    --muted: #1f2940;
+    --muted-foreground: #9aa4b8;
+    --accent: #1f2940;
+    --accent-foreground: #e7ebf3;
+    --destructive: #ff6b7d;
+    --border: #27314a;
+    --input: #33405e;
+    --ring: #e7ebf3;
+    --pen: #ff6b7d;
+    --highlight: rgb(255 231 102 / 0.28);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  ::selection {
+    background: var(--highlight);
+    color: var(--foreground);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* A highlighter stroke: slightly uneven, sits low behind the words. */
+@utility highlighter {
+  background-image: linear-gradient(
+    100deg,
+    transparent 0.2em,
+    var(--highlight) 0.4em,
+    var(--highlight) calc(100% - 0.4em),
+    transparent calc(100% - 0.2em)
+  );
+  background-size: 100% 70%;
+  background-position: 0 70%;
+  background-repeat: no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.15em;
+}
+
+/* Trace steps appear in order (delay set per step in Trace.tsx). */
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@utility animate-step {
+  animation: step-in 0.25s ease-out both;
+}
+
+/* Clicking a [n] reference briefly rings the quoted passage it points to. */
+@keyframes flash {
+  0% { box-shadow: 0 0 0 3px var(--highlight); }
+  100% { box-shadow: 0 0 0 3px transparent; }
+}
+@utility animate-flash {
+  animation: flash 1.6s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

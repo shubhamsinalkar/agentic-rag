@@ -24,3 +24,4 @@ class State(TypedDict, total=False):
     attempts: int               # rewrites done so far; caps the retry loop
     answer: str                 # written by generate
     sources: list[str]          # "paper.pdf p.N" for chunks the answer cites
+    citations: list[dict]       # cited [n] blocks with their text, for the UI
