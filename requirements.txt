@@ -13,4 +13,7 @@ langgraph==1.2.16                # step 2: the agent graph (state, nodes, edges)
 scikit-learn==1.9.1              # step 5: query router; MUST match the version
                                  # router.pkl was trained with
 joblib==1.6.0                    # loads models/router.pkl
+numpy==2.5.4                     # shipped index vectors (data/index/embeddings.npy)
+fastapi==0.159.1                 # step 7: POST /ask, GET /health, demo page
+uvicorn==0.54.0                  # the web server that runs FastAPI
 python-dotenv==1.2.4           # loads GOOGLE_API_KEY from .env

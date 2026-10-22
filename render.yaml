@@ -1,0 +1,22 @@
+# Render Blueprint: one free web service.
+# In Render: New > Blueprint > pick this repo, then paste GOOGLE_API_KEY when asked.
+services:
+  - type: web
+    name: agentic-rag
+    runtime: python
+    plan: free
+    region: singapore          # closest Render region to India
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      python -m app.corpus &&
+      python -m app.ingest --from-export
+    # 1) install, 2) fetch the 6 pinned papers from arXiv (they can't be in
+    # the repo), 3) rebuild the search index from the shipped vectors:
+    # no embedding API calls, so deploys don't spend the daily quota.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.13           # the version everything was tested on
+      - key: GOOGLE_API_KEY
+        sync: false              # secret: entered in the Render dashboard, never committed

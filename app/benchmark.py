@@ -22,7 +22,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 from app.ingest import ROOT
-from app.nodes import IDK
+from app.nodes import IDK, LLM_MAX_RETRIES, LLM_TIMEOUT_S
 from app.strategies import STRATEGIES
 
 OUT_DIR = ROOT / "data" / "benchmark"
@@ -166,7 +166,8 @@ def judge() -> None:
     todo = [r for r in _read(RUNS) if (r["id"], r["strategy"]) not in done]
     print(f"{len(done)} already judged, {len(todo)} to go")
     grader = JUDGE_PROMPT | ChatGoogleGenerativeAI(
-        model=JUDGE_MODEL, max_retries=3).with_structured_output(Verdict)
+        model=JUDGE_MODEL, timeout=LLM_TIMEOUT_S, max_retries=LLM_MAX_RETRIES,
+    ).with_structured_output(Verdict)
 
     for i, r in enumerate(todo, start=1):
         q = questions[r["id"]]

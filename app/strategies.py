@@ -27,7 +27,7 @@ def agentic_rag(question: str) -> dict:
     """Step 3's graph: grade, rewrite and retry (max 2) before answering."""
     final = ask(question)
     return {"answer": final["answer"], "sources": final["sources"],
-            "retries": final.get("attempts", 0)}
+            "retries": final.get("attempts", 0), "route": final.get("route")}
 
 
 def cag_whole_paper(question: str) -> dict:

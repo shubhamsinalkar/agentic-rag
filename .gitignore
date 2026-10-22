@@ -12,3 +12,6 @@ cache/
 
 # progress log of python -m app.benchmark
 data/benchmark/run.log
+
+# Papers are downloaded by `python -m app.corpus`; 3 of 6 may not be redistributed
+data/docs/*.pdf
