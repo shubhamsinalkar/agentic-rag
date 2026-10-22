@@ -71,6 +71,17 @@ def test_quota_errors_become_a_friendly_503(client, monkeypatch):
     assert r.status_code == 503 and "quota" in r.json()["detail"]
 
 
+def test_google_overload_becomes_a_busy_503(client, monkeypatch):
+    """Seen live at peak hours: 504 DEADLINE_EXCEEDED from the free tier."""
+    from langchain_google_genai.chat_models import GoogleAPIError
+
+    def overloaded(question):
+        raise GoogleAPIError(504, {"error": {"message": "Deadline expired"}})
+    monkeypatch.setitem(main.STRATEGIES, "plain_rag", overloaded)
+    r = client.post("/ask", json={"question": "What is CRAG?", "strategy": "plain_rag"})
+    assert r.status_code == 503 and "overloaded" in r.json()["detail"]
+
+
 def test_unexpected_errors_hide_details(client, monkeypatch):
     def boom(question):
         raise ValueError("secret internal detail")

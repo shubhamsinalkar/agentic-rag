@@ -14,9 +14,10 @@ from pathlib import Path
 from threading import Lock
 from typing import Literal
 
+import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
-from google.genai.errors import ClientError
+from google.genai.errors import ClientError, ServerError
 from pydantic import BaseModel, Field
 
 from app import nodes, router
@@ -106,6 +107,20 @@ def _client_ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+def _upstream_problem(err: Exception) -> str | None:
+    """Was this Google's fault? "quota" (429), "busy" (5xx / timeout), or None.
+
+    LangChain wraps Google's errors, so check the exception and its cause.
+    Found in step 7: at peak hours the free tier answers 504 DEADLINE_EXCEEDED.
+    """
+    for e in (err, err.__cause__):
+        if isinstance(e, ClientError) and e.code == 429:
+            return "quota"
+        if isinstance(e, (ServerError, httpx.TimeoutException)):
+            return "busy"
+    return None
+
+
 # A plain `def` (not async): the graph makes blocking network calls, and
 # FastAPI runs sync endpoints in a thread pool so they don't block others.
 @app.post("/ask", response_model=AskResponse)
@@ -115,10 +130,13 @@ def ask(body: AskRequest, request: Request) -> AskResponse:
     try:
         out = STRATEGIES[body.strategy](body.question.strip())
     except Exception as err:
-        cause = err.__cause__ or err
-        if isinstance(cause, ClientError) and cause.code == 429:
+        problem = _upstream_problem(err)
+        if problem == "quota":
             raise HTTPException(503, "The free AI quota is used up for now. "
                                      "Please try again later.") from err
+        if problem == "busy":
+            raise HTTPException(503, "The AI service is overloaded right now. "
+                                     "Please try again in a minute.") from err
         log.exception("ask failed")
         raise HTTPException(500, "Something went wrong answering that question.") from err
     return AskResponse(answer=out["answer"], sources=out["sources"], strategy=body.strategy,
