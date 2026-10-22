@@ -9,3 +9,6 @@ __pycache__/
 chroma_db/
 # Question embeddings saved to spare the free-tier quota (app/query_cache.py)
 cache/
+
+# progress log of python -m app.benchmark
+data/benchmark/run.log

@@ -35,9 +35,13 @@ TESTSET = ROOT / "data" / "testset.json"
 # 10/min, so rate-limit back-offs don't inflate the measured latency.
 PAUSE_S = 6
 
-# A different, stronger model than the one that wrote the answers: a model
-# grading its own output tends to be lenient with it (self-preference bias).
-JUDGE_MODEL = "gemini-3.5-flash"
+# A different model from the one that wrote the answers: a model grading its
+# own output tends to be lenient with it (self-preference bias).
+# The first choice, gemini-3.5-flash, allows only 20 free requests per day,
+# so it graded just 20 answers (kept in judgments_flash_sample.jsonl as a
+# cross-check). gemini-3.1-flash-lite is an older, separate model with a
+# much larger free quota; every verdict is also audited by hand.
+JUDGE_MODEL = "gemini-3.1-flash-lite"
 
 
 # ------------------------------------------------------------ measurement ---

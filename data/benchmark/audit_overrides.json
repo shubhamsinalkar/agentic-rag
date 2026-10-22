@@ -1,0 +1,6 @@
+[
+  {"id": "q01", "strategy": "plain_rag", "verdict": "partial",
+   "reason": "Names BART but says the parameter count is not in its context; the reference requires ~400M. The judge rated it correct; gemini-3.5-flash rated it partial."},
+  {"id": "q06", "strategy": "agentic_rag", "verdict": "partial",
+   "reason": "Gives the 0.77B size but says the model is not named; the reference requires T5-large. The judge rated it correct; gemini-3.5-flash rated it partial."}
+]
