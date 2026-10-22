@@ -108,12 +108,14 @@ def _vectorstore():
 
 # Every network call needs a time limit. Found in step 7: a Gemini call
 # that never answered left a web request hanging for 5+ minutes, because
-# the default is to wait forever. Our slowest normal call (CAG with two
-# whole papers, ~55k tokens) takes ~5 s, so 30 s means "it's stuck".
-LLM_TIMEOUT_S = 30
-# A stuck or rate-limited (429/503) call is retried with back-off, at most
-# twice: worst case ~90 s per call, instead of forever.
-LLM_MAX_RETRIES = 2
+# the default is to wait forever.
+# Why 60 s: off-peak, our slowest call (CAG, two whole papers) takes ~5 s,
+# but at peak hours the free tier took 25-43 s even for "reply OK". 30 s
+# turned those slow-but-working calls into errors; 60 s lets them finish.
+LLM_TIMEOUT_S = 60
+# One retry after a timeout or 429/5xx: worst case ~2 min per call instead
+# of forever. More retries at 60 s each would leave users waiting too long.
+LLM_MAX_RETRIES = 1
 
 
 @lru_cache(maxsize=1)

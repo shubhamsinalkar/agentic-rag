@@ -93,7 +93,7 @@ tests/             API, router, grader, CAG, cache, index export
 ## Engineering notes
 
 - **No paper text in the repo.** Three of the papers use arXiv's standard license, which doesn't allow redistribution. `app/corpus.py` downloads pinned versions (checked by SHA-256), and the index ships as **vectors + chunk hashes only**. The deploy re-splits the PDFs, verifies every hash and re-attaches the vectors: an identical index with zero embedding API calls. (A full rebuild costs 635 of the free tier's 1,000 daily embedding requests.)
-- **Every network call has a timeout** (30 s, two retries). Found in testing: a Gemini call that never answered left a request hanging for over 5 minutes.
+- **Every network call has a timeout** (LLM: 60 s with one retry; embeddings: 30 s). Found in testing: a Gemini call that never answered left a request hanging for over 5 minutes. The LLM limit is 60 s rather than 30 s because at peak hours the free tier takes 25–40 s even for trivial calls.
 - **No PyTorch, no local models.** Embeddings and the LLM are API calls, so the server fits Render's free 512 MB (it uses ~300 MB).
 - **Stack:** LangGraph, LangChain, ChromaDB, Gemini (`gemini-3.5-flash-lite`, `gemini-embedding-2` at 768 dimensions), scikit-learn, FastAPI, Render.
 
