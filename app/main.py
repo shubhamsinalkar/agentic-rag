@@ -131,6 +131,8 @@ def ask(body: AskRequest, request: Request) -> AskResponse:
         out = STRATEGIES[body.strategy](body.question.strip())
     except Exception as err:
         problem = _upstream_problem(err)
+        if problem:
+            log.warning("upstream %s: %s", problem, str(err)[:300])
         if problem == "quota":
             raise HTTPException(503, "The free AI quota is used up for now. "
                                      "Please try again later.") from err

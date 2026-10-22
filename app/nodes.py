@@ -106,31 +106,60 @@ def _vectorstore():
     return get_vectorstore()
 
 
-# Every network call needs a time limit. Found in step 7: a Gemini call
-# that never answered left a web request hanging for 5+ minutes, because
-# the default is to wait forever.
-# Why 60 s: off-peak, our slowest call (CAG, two whole papers) takes ~5 s,
-# but at peak hours the free tier took 25-43 s even for "reply OK". 30 s
-# turned those slow-but-working calls into errors; 60 s lets them finish.
+# ---- timeouts and the fallback model (found while deploying, step 7) ----
+# 1. Every network call needs a time limit: a Gemini call that never
+#    answered once left a web request hanging for 5+ minutes.
+# 2. At peak hours (Indian evening) the free tier slowed down PER MODEL:
+#    gemini-3.5-flash-lite took 24-43 s for "reply OK" or returned 504,
+#    while gemini-3.1-flash-lite answered in ~5 s. So each call tries the
+#    main model briefly, then falls back to a different model, which also
+#    has its own separate free quota.
+#
+# Off-peak, our slowest main-model call (CAG, two whole papers) takes ~5 s,
+# so 20 s means "overloaded": stop waiting and use the fallback.
+PRIMARY_TIMEOUT_S = 20
+# The fallback is the last resort, so it gets more patience and one retry
+# (worst case ~2 min per call instead of forever).
 LLM_TIMEOUT_S = 60
-# One retry after a timeout or 429/5xx: worst case ~2 min per call instead
-# of forever. More retries at 60 s each would leave users waiting too long.
 LLM_MAX_RETRIES = 1
+# Older lite model, a different deployment from the main one. The benchmark
+# measured LLM_MODEL only; fallback answers may differ slightly in quality.
+FALLBACK_MODEL = "gemini-3.1-flash-lite"
+
+
+def _primary():
+    # No retries on the main model: when it's overloaded, retrying it just
+    # adds another 20 s before the fallback gets a chance.
+    return ChatGoogleGenerativeAI(model=LLM_MODEL, timeout=PRIMARY_TIMEOUT_S, max_retries=0)
+
+
+def _fallback():
+    return ChatGoogleGenerativeAI(model=FALLBACK_MODEL, timeout=LLM_TIMEOUT_S,
+                                  max_retries=LLM_MAX_RETRIES)
 
 
 @lru_cache(maxsize=1)
 def llm():
-    return ChatGoogleGenerativeAI(model=LLM_MODEL, timeout=LLM_TIMEOUT_S,
-                                  max_retries=LLM_MAX_RETRIES)
+    """The chat model used everywhere: main model, fallback on any error."""
+    return _primary().with_fallbacks([_fallback()])
+
+
+def structured(schema):
+    """Same main -> fallback chain, but the reply is forced into `schema`.
+
+    with_structured_output forces the reply into a pydantic schema (JSON
+    validated), so code reads real booleans instead of parsing free text
+    like "Yes, mostly...". It has to be applied to each model before
+    chaining the fallback, so it gets its own helper.
+    """
+    return _primary().with_structured_output(schema).with_fallbacks(
+        [_fallback().with_structured_output(schema)])
 
 
 @lru_cache(maxsize=1)
 def _grader():
     # prompt | model: fill the prompt, then call the model with it.
-    # with_structured_output forces the reply into the Grading schema (JSON
-    # validated by pydantic), so the code reads real booleans instead of
-    # parsing free text like "Yes, mostly...".
-    return GRADE_PROMPT | llm().with_structured_output(Grading)
+    return GRADE_PROMPT | structured(Grading)
 
 
 # ----------------------------------------------------------------- helpers ---

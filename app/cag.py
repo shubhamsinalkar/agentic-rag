@@ -26,7 +26,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
 from app.ingest import DOCS_DIR, PdfReader
-from app.nodes import IDK, llm
+from app.nodes import IDK, llm, structured
 
 # Frozen corpus, so a hand-written catalog is fine. The selector reads only
 # these lines, never the papers, so the choice costs ~300 tokens.
@@ -85,7 +85,7 @@ def paper_text(name: str) -> str:
 
 @lru_cache(maxsize=1)
 def _selector():
-    return SELECT_PROMPT | llm().with_structured_output(PaperChoice)
+    return SELECT_PROMPT | structured(PaperChoice)
 
 
 def select_papers(question: str) -> list[str]:
