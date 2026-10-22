@@ -60,7 +60,11 @@ GRADE_PROMPT = ChatPromptTemplate.from_messages([
      "2. Decide if the relevant chunks TOGETHER are sufficient to answer "
      "the question fully and specifically. If a detail the question asks "
      "for (a mechanism, condition, number, name) is absent, it is NOT "
-     "sufficient; say in `missing` exactly what information is still needed."),
+     "sufficient; say in `missing` exactly what information is still needed.\n"
+     "3. For HOW, WHY or WHEN questions, the chunks must state the actual "
+     "rule, condition, threshold or steps. Naming a concept is not "
+     "explaining it: a chunk saying a method 'decides X' or 'uses a score "
+     "to classify Y' without saying how is NOT sufficient."),
     ("human", "Question: {question}\n\nChunks:\n\n{context}"),
 ])
 
@@ -115,9 +119,11 @@ def _vectorstore():
 #    main model briefly, then falls back to a different model, which also
 #    has its own separate free quota.
 #
-# Off-peak, our slowest main-model call (CAG, two whole papers) takes ~5 s,
-# so 20 s means "overloaded": stop waiting and use the fallback.
-PRIMARY_TIMEOUT_S = 20
+# Off-peak, our slowest main-model call (CAG, two whole papers) takes ~5 s.
+# 30 s, not 20: at peak, grading calls took 8-18 s, close enough to a 20 s
+# limit that the weaker fallback ended up doing the grading, and a
+# lenient grader stops the correction loop from firing.
+PRIMARY_TIMEOUT_S = 30
 # The fallback is the last resort, so it gets more patience and one retry
 # (worst case ~2 min per call instead of forever).
 LLM_TIMEOUT_S = 60
@@ -127,25 +133,35 @@ LLM_MAX_RETRIES = 1
 FALLBACK_MODEL = "gemini-3.1-flash-lite"
 
 
+# Decisions (grading, picking papers) should not vary between runs: in
+# step 7 the same question got "not sufficient" in the benchmark and
+# "sufficient" live, so the loop fired once and not the other time.
+# Temperature 0 = always the most likely answer. Only the FALLBACK accepts
+# it: gemini-3.5-flash-lite has fixed sampling and ignores temperature
+# (LangChain warns). That's the model that matters here: the lenient
+# verdicts came from the fallback. Writing (answers, rewrites) keeps defaults.
+DECISION_TEMPERATURE = 0.0
+
+
 def _primary():
     # No retries on the main model: when it's overloaded, retrying it just
-    # adds another 20 s before the fallback gets a chance.
+    # adds another 30 s before the fallback gets a chance.
     return ChatGoogleGenerativeAI(model=LLM_MODEL, timeout=PRIMARY_TIMEOUT_S, max_retries=0)
 
 
-def _fallback():
+def _fallback(temperature=None):
     return ChatGoogleGenerativeAI(model=FALLBACK_MODEL, timeout=LLM_TIMEOUT_S,
-                                  max_retries=LLM_MAX_RETRIES)
+                                  max_retries=LLM_MAX_RETRIES, temperature=temperature)
 
 
 @lru_cache(maxsize=1)
 def llm():
-    """The chat model used everywhere: main model, fallback on any error."""
+    """The chat model for writing: main model, fallback on any error."""
     return _primary().with_fallbacks([_fallback()])
 
 
 def structured(schema):
-    """Same main -> fallback chain, but the reply is forced into `schema`.
+    """Main -> fallback chain for DECISIONS: reply forced into `schema`.
 
     with_structured_output forces the reply into a pydantic schema (JSON
     validated), so code reads real booleans instead of parsing free text
@@ -153,7 +169,7 @@ def structured(schema):
     chaining the fallback, so it gets its own helper.
     """
     return _primary().with_structured_output(schema).with_fallbacks(
-        [_fallback().with_structured_output(schema)])
+        [_fallback(DECISION_TEMPERATURE).with_structured_output(schema)])
 
 
 @lru_cache(maxsize=1)

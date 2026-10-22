@@ -61,6 +61,15 @@ def test_on_topic_but_vague_chunks_are_not_sufficient():
 
 
 @needs_api
+def test_first_search_for_the_demo_question_is_not_sufficient():
+    """Found live in step 7: these exact chunks (CRAG overview pages) were
+    once graded sufficient, so the loop never fired and the answer was vague.
+    They name the Correct/Incorrect/Ambiguous actions but not the rule."""
+    docs = nodes.retrieve({"question": CRAG_QUESTION})["documents"]
+    assert _grade(docs)["sufficient"] is False
+
+
+@needs_api
 def test_accepts_the_chunk_that_answers():
     """Page 5 states the rule (all scores below the lower threshold)."""
     answer_chunk = _chunks({"source": "corrective_rag.pdf"}, limit=1,
