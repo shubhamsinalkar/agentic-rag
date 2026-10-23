@@ -1,4 +1,4 @@
-"""Step 6: run every test question through every strategy, then grade answers.
+"""Benchmark: run every test question through every strategy, then grade answers.
 
     .venv\\Scripts\\python -m app.benchmark run     # ~30 min on the free tier
     .venv\\Scripts\\python -m app.benchmark judge   # LLM-as-judge, ~15 min

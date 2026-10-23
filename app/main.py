@@ -122,7 +122,7 @@ def _upstream_problem(err: Exception) -> str | None:
     """Was this Google's fault? "quota" (429), "busy" (5xx / timeout), or None.
 
     LangChain wraps Google's errors, so check the exception and its cause.
-    Found in step 7: at peak hours the free tier answers 504 DEADLINE_EXCEEDED.
+    Seen in practice: at peak hours the free tier answers 504 DEADLINE_EXCEEDED.
     """
     for e in (err, err.__cause__):
         if isinstance(e, ClientError) and e.code == 429:

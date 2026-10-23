@@ -110,7 +110,7 @@ def _vectorstore():
     return get_vectorstore()
 
 
-# ---- timeouts and the fallback model (found while deploying, step 7) ----
+# ---- timeouts and the fallback model (found while deploying) ----
 # 1. Every network call needs a time limit: a Gemini call that never
 #    answered once left a web request hanging for 5+ minutes.
 # 2. At peak hours (Indian evening) the free tier slowed down PER MODEL:
@@ -134,7 +134,7 @@ FALLBACK_MODEL = "gemini-3.1-flash-lite"
 
 
 # Decisions (grading, picking papers) should not vary between runs: in
-# step 7 the same question got "not sufficient" in the benchmark and
+# testing the same question got "not sufficient" in the benchmark and
 # "sufficient" live, so the loop fired once and not the other time.
 # Temperature 0 = always the most likely answer. Only the FALLBACK accepts
 # it: gemini-3.5-flash-lite has fixed sampling and ignores temperature

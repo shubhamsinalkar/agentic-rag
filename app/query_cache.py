@@ -21,7 +21,7 @@ class CachedQueryEmbeddings(Embeddings):
 
     The cache key includes the model name and size: vectors from a different
     model live in a different "space", and silently mixing them would ruin
-    search with no error (the trap from step 1).
+    search with no error (see get_vectorstore in ingest.py).
     """
 
     def __init__(self, inner: Embeddings, path: Path, model_id: str):

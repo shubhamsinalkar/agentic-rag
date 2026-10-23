@@ -23,7 +23,7 @@ def _ms(since: float) -> int:
 
 
 def plain_rag(question: str) -> dict:
-    """Step 2's pipeline: search once, answer from whatever came back."""
+    """The baseline pipeline: search once, answer from whatever came back."""
     state, steps = {"question": question}, []
     t = time.perf_counter()
     state |= retrieve(state)
@@ -53,7 +53,7 @@ def _describe(node: str, out: dict, seen_before: int, ms: int) -> dict:
 
 
 def agentic_rag(question: str) -> dict:
-    """Step 3's graph: grade, rewrite and retry (max 2) before answering.
+    """The agent graph: grade, rewrite and retry (max 2) before answering.
 
     Streams the graph instead of invoke() so every step can be reported.
     """

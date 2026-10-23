@@ -62,7 +62,7 @@ def test_on_topic_but_vague_chunks_are_not_sufficient():
 
 @needs_api
 def test_first_search_for_the_demo_question_is_not_sufficient():
-    """Found live in step 7: these exact chunks (CRAG overview pages) were
+    """Found in live testing: these exact chunks (CRAG overview pages) were
     once graded sufficient, so the loop never fired and the answer was vague.
     They name the Correct/Incorrect/Ambiguous actions but not the rule."""
     docs = nodes.retrieve({"question": CRAG_QUESTION})["documents"]
@@ -82,7 +82,7 @@ def test_accepts_the_chunk_that_answers():
 
 @needs_api
 def test_one_side_of_a_comparison_counts_as_relevant():
-    """Bug found in step 5: for "how does ReAct differ from RAG?", every
+    """Bug found in testing: for "how does ReAct differ from RAG?", every
     chunk covers only one side, and the grader used to reject them all."""
     react_actions = _chunks({"source": "react.pdf"}, limit=1, contains="lookup[string]")
     result = nodes.grade({

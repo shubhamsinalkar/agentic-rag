@@ -23,7 +23,7 @@ md("""# 01 · Query router: TF-IDF + logistic regression
 | `comparison` | "How does CRAG differ from Self-RAG?" | retrieve **more** chunks (k=8): the answer spans two papers |
 | `off_topic` | "How do I make pancakes?" | **skip retrieval**, answer "I don't know" immediately |
 
-`factual` and `conceptual` take the same path for now; the label is still recorded so the benchmark (step 6) can report accuracy **per question type**.
+`factual` and `conceptual` take the same path for now; the label is still recorded so the benchmark can report accuracy **per question type**.
 
 **Why not ask the LLM to classify?** It would cost ~1s and a free-tier request per question, and its answer can vary between runs. TF-IDF + logistic regression runs locally in about 1 ms, gives the same answer every time, and outputs **probabilities** we can put a threshold on (section 8)."""),
 
@@ -203,7 +203,7 @@ print(f"chosen threshold {OFF_TOPIC_MIN_PROB}: catches {int(safe['off-topic caug
 
 md("""## 9 · Out-of-sample check: the 30 benchmark questions
 
-These were written separately for step 4 and **never used in training**, so this is an independent test. `q30` ("What accuracy does CRAG report on MMLU?") *sounds* on-topic, but the answer isn't in the papers. The router can't know that; the grader will catch it. **Two layers:** the router stops obvious off-topic questions cheaply, and the grader catches the subtle ones."""),
+These were written separately as the benchmark test set and **never used in training**, so this is an independent test. `q30` ("What accuracy does CRAG report on MMLU?") *sounds* on-topic, but the answer isn't in the papers. The router can't know that; the grader will catch it. **Two layers:** the router stops obvious off-topic questions cheaply, and the grader catches the subtle ones."""),
 
 code("""bench = pd.DataFrame(json.loads((ROOT / "data" / "testset.json").read_text(encoding="utf-8")))
 bench["type"] = bench["type"].replace({"out_of_scope": "off_topic"})
@@ -220,7 +220,7 @@ md("""**Reading these misses honestly:**
 - Most other misses are `factual`/`conceptual` ↔ `comparison`. Some are arguably **label ambiguity in the test set** rather than router errors: *"What is the difference between RAG-Sequence and RAG-Token?"* is labelled `conceptual`, but it literally asks for a difference. Two-part factual questions (*"which single-hop **and** which multi-hop datasets"*) look like comparisons because `and` is a strong comparison signal.
 - These mix-ups are **cheap**: a `comparison` route only retrieves 8 chunks instead of 4.
 
-A real fix would need more and better-defined training labels. *the model is only as good as the label definitions.*"""),
+A real fix would need more and better-defined training labels: *the model is only as good as the label definitions.*"""),
 
 md("""## 10 · What did the model learn?
 
