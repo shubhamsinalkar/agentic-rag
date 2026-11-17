@@ -14,14 +14,14 @@ needs_api = pytest.mark.skipif(
 
 
 @pytest.mark.parametrize("text, expected", [
-    ("as shown [corrective_rag.pdf p.5].", ["corrective_rag.pdf p.5"]),
-    ("as shown [corrective_rag.pdf p. 5].", ["corrective_rag.pdf p.5"]),
-    ("[corrective_rag.pdf p.2, p.4]", ["corrective_rag.pdf p.2", "corrective_rag.pdf p.4"]),
-    ("[react.pdf p.3]", []),                                  # not a paper we gave it
-    ("[corrective_rag.pdf p.5] [corrective_rag.pdf p.5]", ["corrective_rag.pdf p.5"]),
+    ("as shown [chexnet.pdf p.5].", ["chexnet.pdf p.5"]),
+    ("as shown [chexnet.pdf p. 5].", ["chexnet.pdf p.5"]),
+    ("[chexnet.pdf p.2, p.4]", ["chexnet.pdf p.2", "chexnet.pdf p.4"]),
+    ("[planet_nine.pdf p.3]", []),                                  # not a paper we gave it
+    ("[chexnet.pdf p.5] [chexnet.pdf p.5]", ["chexnet.pdf p.5"]),
 ])
 def test_cited_pages(text, expected):
-    assert cag.cited_pages(text, ["corrective_rag.pdf"]) == expected
+    assert cag.cited_pages(text, ["chexnet.pdf"]) == expected
 
 
 def test_every_catalog_entry_is_a_real_file():
@@ -31,14 +31,14 @@ def test_every_catalog_entry_is_a_real_file():
 
 @needs_api
 def test_selects_the_right_paper():
-    assert cag.select_papers("How does CRAG decide a retrieved document is "
-                             "incorrect?") == ["corrective_rag.pdf"]
+    assert cag.select_papers("How did the CheXNet authors decide that CheXNet "
+                             "beats radiologists?") == ["chexnet.pdf"]
 
 
 @needs_api
 def test_selects_both_papers_for_a_comparison():
-    assert cag.select_papers("How do CRAG and Self-RAG differ in judging "
-                             "retrieved documents?") == ["corrective_rag.pdf", "self_rag.pdf"]
+    assert cag.select_papers("How do CheXNet and the Transformer differ in their "
+                             "Adam optimizer settings?") == ["chexnet.pdf", "transformer.pdf"]
 
 
 @needs_api

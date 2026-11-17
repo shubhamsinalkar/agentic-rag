@@ -21,7 +21,7 @@ def client(monkeypatch):
 def test_health(client):
     body = client.get("/health").json()
     assert body["status"] == "ok"
-    assert body["chunks"] == 635
+    assert body["chunks"] == 641
     assert body["papers"] == 6
 
 
@@ -42,7 +42,7 @@ def test_api_routes_win_over_the_website(client):
 @pytest.mark.parametrize("payload", [
     {"question": "hi"},                                  # too short
     {"question": "x" * 501},                             # too long
-    {"question": "What is CRAG?", "strategy": "magic"},  # unknown strategy
+    {"question": "What is CheXNet?", "strategy": "magic"},  # unknown strategy
     {},                                                  # missing
 ])
 def test_rejects_bad_input(client, payload):
@@ -80,7 +80,7 @@ def test_quota_errors_become_a_friendly_503(client, monkeypatch):
         except ClientError as e:
             raise RuntimeError("wrapped, like LangChain does") from e
     monkeypatch.setitem(main.STRATEGIES, "plain_rag", out_of_quota)
-    r = client.post("/ask", json={"question": "What is CRAG?", "strategy": "plain_rag"})
+    r = client.post("/ask", json={"question": "What is CheXNet?", "strategy": "plain_rag"})
     assert r.status_code == 503 and "quota" in r.json()["detail"]
 
 
@@ -91,7 +91,7 @@ def test_google_overload_becomes_a_busy_503(client, monkeypatch):
     def overloaded(question):
         raise GoogleAPIError(504, {"error": {"message": "Deadline expired"}})
     monkeypatch.setitem(main.STRATEGIES, "plain_rag", overloaded)
-    r = client.post("/ask", json={"question": "What is CRAG?", "strategy": "plain_rag"})
+    r = client.post("/ask", json={"question": "What is CheXNet?", "strategy": "plain_rag"})
     assert r.status_code == 503 and "overloaded" in r.json()["detail"]
 
 
@@ -99,5 +99,5 @@ def test_unexpected_errors_hide_details(client, monkeypatch):
     def boom(question):
         raise ValueError("secret internal detail")
     monkeypatch.setitem(main.STRATEGIES, "plain_rag", boom)
-    r = client.post("/ask", json={"question": "What is CRAG?", "strategy": "plain_rag"})
+    r = client.post("/ask", json={"question": "What is CheXNet?", "strategy": "plain_rag"})
     assert r.status_code == 500 and "secret" not in r.text

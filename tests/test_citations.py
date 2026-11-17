@@ -6,14 +6,14 @@ from app import nodes
 
 
 def _doc(page, text):
-    return Document(page_content=text, metadata={"source": "corrective_rag.pdf", "page": page})
+    return Document(page_content=text, metadata={"source": "chexnet.pdf", "page": page})
 
 
 def test_only_cited_blocks_come_back_in_first_cited_order():
     docs = [_doc(3, "overview"), _doc(5, "Incorrect if below\nthe lower threshold"), _doc(6, "x")]
     out = nodes._citations("Rule is X [2]. Also [1] and again [2]. Bad ref [9].", docs)
     assert [c["n"] for c in out] == [2, 1]
-    assert out[0] == {"n": 2, "source": "corrective_rag.pdf", "page": 5,
+    assert out[0] == {"n": 2, "source": "chexnet.pdf", "page": 5,
                       "text": "Incorrect if below the lower threshold"}
 
 

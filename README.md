@@ -1,10 +1,12 @@
 # Agentic RAG: self-correcting retrieval over research papers
 
-A question-answering service over six papers about retrieval-augmented generation. Unlike plain RAG, the agent **grades what it retrieved** and, if the chunks don't actually answer the question, **rewrites the query and searches again** (at most twice). Three strategies are implemented and benchmarked against each other: plain RAG, agentic RAG and CAG (whole paper in the prompt).
+A question-answering service over six easy-to-read papers from six different fields: medicine, social networks, economics, physics, astronomy and computer science. The papers are deliberately *not* about RAG, so questions about the corpus never get mixed up with the system that answers them. Unlike plain RAG, the agent **grades what it retrieved** and, if the chunks don't actually answer the question, **rewrites the query and searches again** (at most twice). Three strategies are implemented and benchmarked against each other: plain RAG, agentic RAG and CAG (whole paper in the prompt).
 
 **Live demo:** _coming soon_
 
 ![Benchmark: answer quality and latency for the three strategies](docs/benchmark.png)
+
+> **Note:** the benchmark numbers, chart and analysis below were measured on the project's *previous* corpus (six RAG papers). The test set in `data/testset.json` has been rewritten for the new papers; re-run `python -m app.benchmark run && python -m app.benchmark judge` to refresh them.
 
 **When each strategy wins.** On 30 hand-checked questions, CAG answered 30/30, agentic RAG 24/30 and plain RAG 20/30, all within 10 s at p90 (measured on Gemini's free tier). **CAG wins when the knowledge fits in the prompt:** with 1–2 whole papers in context it never missed, but it sends ~25× the input tokens of plain RAG and stops being an option once the corpus is too big for the context window. **Agentic RAG beats plain RAG when the first search lands on the wrong chunks:** the correction loop fixed 5 questions and broke 1 (+13 points, though with 30 questions the 95% interval is 0 to +30), at ~3 LLM calls instead of 1 and +1.4 s median latency. A second retry rarely helped (1 of 4), and both search-based strategies still miss answers spread across tables and two-paper comparisons. Full analysis: [`notebooks/02_benchmark.ipynb`](notebooks/02_benchmark.ipynb).
 
@@ -58,7 +60,7 @@ uvicorn app.main:app            # open http://127.0.0.1:8000
 Other entry points:
 
 ```bash
-python -m app.graph "How does CRAG decide a retrieved document is incorrect?"   # watch the loop step by step
+python -m app.graph "How did the CheXNet authors decide CheXNet beats radiologists?"   # watch the loop step by step
 python -m app.strategies "your question"     # all three strategies side by side
 python -m app.benchmark run && python -m app.benchmark judge                     # re-run the benchmark
 pip install -r requirements-dev.txt && python -m pytest                          # tests (some call the API)
@@ -105,7 +107,7 @@ tests/             API, router, grader, CAG, cache, index export
 
 ## Engineering notes
 
-- **No paper text in the repo.** Three of the papers use arXiv's standard license, which doesn't allow redistribution. `app/corpus.py` downloads pinned versions (checked by SHA-256), and the index ships as **vectors + chunk hashes only**. The deploy re-splits the PDFs, verifies every hash and re-attaches the vectors: an identical index with zero embedding API calls. (A full rebuild costs 635 of the free tier's 1,000 daily embedding requests.)
+- **No paper text in the repo.** Four of the papers use arXiv's standard license, which doesn't allow redistribution. `app/corpus.py` downloads pinned versions (checked by SHA-256), and the index ships as **vectors + chunk hashes only**. The deploy re-splits the PDFs, verifies every hash and re-attaches the vectors: an identical index with zero embedding API calls. (A full rebuild costs 641 of the free tier's 1,000 daily embedding requests.)
 - **Every network call has a timeout, and the LLM has a fallback.** Found in testing: a Gemini call that never answered left a request hanging for over 5 minutes. At peak hours the free tier slows down per model (`gemini-3.5-flash-lite` took 24–43 s for a trivial call while `gemini-3.1-flash-lite` took 5 s), so each call gives the main model 20 s, then switches to `gemini-3.1-flash-lite` (60 s, one retry). The benchmark measured the main model only. When every model is overloaded, the API returns a clear 503 "try again in a minute".
 - **Grader consistency.** Live, the demo question was once graded "sufficient" from vague overview chunks, so the loop never fired. Fixes: the main model gets 30 s before falling back (the lenient grading came from the weaker fallback), the fallback grades at temperature 0 (`gemini-3.5-flash-lite` has fixed sampling and ignores temperature), and the prompt now requires the actual rule or condition for *how/why/when* questions. A regression test pins that exact case.
 - **No PyTorch, no local models.** Embeddings and the LLM are API calls, so the server fits Render's free 512 MB (it uses ~300 MB).
@@ -120,11 +122,11 @@ tests/             API, router, grader, CAG, cache, index export
 
 ## Papers
 
-| Paper | arXiv | License |
-|---|---|---|
-| Lewis et al., *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks* | [2005.11401v4](https://arxiv.org/abs/2005.11401v4) | arXiv non-exclusive (not redistributed) |
-| Asai et al., *Self-RAG* | [2310.11511v1](https://arxiv.org/abs/2310.11511v1) | CC BY 4.0 |
-| Yan et al., *Corrective Retrieval Augmented Generation* | [2401.15884v3](https://arxiv.org/abs/2401.15884v3) | arXiv non-exclusive (not redistributed) |
-| Jeong et al., *Adaptive-RAG* | [2403.14403v2](https://arxiv.org/abs/2403.14403v2) | CC0 1.0 |
-| Liu et al., *Lost in the Middle* | [2307.03172v3](https://arxiv.org/abs/2307.03172v3) | arXiv non-exclusive (not redistributed) |
-| Yao et al., *ReAct* | [2210.03629v3](https://arxiv.org/abs/2210.03629v3) | CC BY 4.0 |
+| Field | Paper | arXiv | License |
+|---|---|---|---|
+| Medicine | Rajpurkar et al., *CheXNet: Radiologist-Level Pneumonia Detection on Chest X-Rays with Deep Learning* | [1711.05225v3](https://arxiv.org/abs/1711.05225v3) | arXiv non-exclusive (not redistributed) |
+| Social networks | Backstrom et al., *Four Degrees of Separation* | [1111.4570v3](https://arxiv.org/abs/1111.4570v3) | arXiv non-exclusive (not redistributed) |
+| Economics | Brynjolfsson, Li & Raymond, *Generative AI at Work* | [2304.11771v2](https://arxiv.org/abs/2304.11771v2) | CC BY-NC-ND 4.0 |
+| Physics | LIGO & Virgo, *Observation of Gravitational Waves from a Binary Black Hole Merger* | [1602.03837v1](https://arxiv.org/abs/1602.03837v1) | CC BY 4.0 |
+| Astronomy | Batygin & Brown, *Evidence for a Distant Giant Planet in the Solar System* | [1601.05438v1](https://arxiv.org/abs/1601.05438v1) | arXiv non-exclusive (not redistributed) |
+| Computer science | Vaswani et al., *Attention Is All You Need* | [1706.03762v7](https://arxiv.org/abs/1706.03762v7) | arXiv non-exclusive (not redistributed) |

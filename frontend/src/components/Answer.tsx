@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 /**
  * Turn citation markers into markdown links the renderer below understands:
  *   RAG answers:  [2]                       -> [2](#cite-2)
- *   CAG answers:  [corrective_rag.pdf p.3, p.5] -> [CRAG p.3, p.5](#paper=corrective_rag.pdf&page=3)
+ *   CAG answers:  [chexnet.pdf p.2, p.3] -> [CheXNet p.2, p.3](#paper=chexnet.pdf&page=2)
  * Fragment links survive react-markdown's URL sanitising; raw HTML never renders.
  */
 function linkCitations(text: string): string {

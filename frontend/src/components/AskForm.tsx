@@ -26,9 +26,9 @@ export const STRATEGIES: { id: Strategy; name: string; how: string }[] = [
 ]
 
 const EXAMPLES = [
-  'How does CRAG decide a retrieved document is incorrect?',
-  'How do CRAG and Self-RAG differ in judging retrieved documents?',
-  'Why does RAG keep the document encoder fixed during training?',
+  'How did the CheXNet authors decide that CheXNet is statistically significantly better than the radiologists?',
+  'How do the Adam optimizer settings of CheXNet and the Transformer differ?',
+  'Why must the source of GW150914 be two black holes?',
   'Who won the 2022 FIFA World Cup?',
 ]
 

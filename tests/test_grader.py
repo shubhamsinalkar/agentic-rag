@@ -18,7 +18,8 @@ from langchain_core.documents import Document
 from app import nodes
 from app.ingest import CHROMA_DIR
 
-CRAG_QUESTION = "How does CRAG decide a retrieved document is incorrect?"
+DEMO_QUESTION = ("How did the CheXNet authors decide that CheXNet is statistically "
+                 "significantly better than the radiologists?")
 
 needs_api = pytest.mark.skipif(
     not (os.getenv("GOOGLE_API_KEY") and CHROMA_DIR.exists()),
@@ -37,68 +38,59 @@ def _chunks(where: dict, limit: int = 4, contains: str | None = None) -> list[Do
 
 
 def _grade(docs: list[Document]) -> dict:
-    return nodes.grade({"question": CRAG_QUESTION, "documents": docs})
+    return nodes.grade({"question": DEMO_QUESTION, "documents": docs})
 
 
 # --------------------------------------------------- grader (real API) ---
 
 @needs_api
 def test_rejects_chunks_from_an_unrelated_paper():
-    """ReAct chunks say nothing about CRAG: all must be rejected."""
-    result = _grade(_chunks({"source": "react.pdf"}))
+    """Planet Nine chunks say nothing about CheXNet: all must be rejected."""
+    result = _grade(_chunks({"source": "planet_nine.pdf"}))
     assert result["documents"] == []
     assert result["sufficient"] is False
 
 
 @needs_api
 def test_on_topic_but_vague_chunks_are_not_sufficient():
-    """The trap: CRAG's title page and abstract are about the right topic
-    and score high in vector search, but don't contain the rule."""
-    result = _grade(_chunks({"$and": [{"source": "corrective_rag.pdf"},
-                                      {"page": {"$in": [1, 10]}}]}))
+    """The trap: CheXNet's first page says it "exceeds average radiologist
+    performance" and scores high in vector search, but never says how
+    significance was tested."""
+    result = _grade(_chunks({"$and": [{"source": "chexnet.pdf"}, {"page": 1}]}))
     assert result["sufficient"] is False
     assert result["missing"], "grader should say what is missing"
 
 
 @needs_api
-def test_first_search_for_the_demo_question_is_not_sufficient():
-    """Found in live testing: these exact chunks (CRAG overview pages) were
-    once graded sufficient, so the loop never fired and the answer was vague.
-    They name the Correct/Incorrect/Ambiguous actions but not the rule."""
-    docs = nodes.retrieve({"question": CRAG_QUESTION})["documents"]
-    assert _grade(docs)["sufficient"] is False
-
-
-@needs_api
 def test_accepts_the_chunk_that_answers():
-    """Page 5 states the rule (all scores below the lower threshold)."""
-    answer_chunk = _chunks({"source": "corrective_rag.pdf"}, limit=1,
-                           contains="below the lower threshold")
+    """Page 3 states the test (bootstrap CI of the F1 difference excludes 0)."""
+    answer_chunk = _chunks({"source": "chexnet.pdf"}, limit=1,
+                           contains="does not contain 0")
     assert answer_chunk, "expected chunk not found in the index"
-    result = _grade(answer_chunk + _chunks({"source": "react.pdf"}, limit=2))
+    result = _grade(answer_chunk + _chunks({"source": "planet_nine.pdf"}, limit=2))
     assert result["sufficient"] is True
     assert [d.id for d in result["documents"]] == [answer_chunk[0].id]
 
 
 @needs_api
 def test_one_side_of_a_comparison_counts_as_relevant():
-    """Bug found in testing: for "how does ReAct differ from RAG?", every
-    chunk covers only one side, and the grader used to reject them all."""
-    react_actions = _chunks({"source": "react.pdf"}, limit=1, contains="lookup[string]")
+    """For a comparison every chunk covers only one side; the grader must
+    still keep it, or comparisons can never be answered."""
+    chexnet_adam = _chunks({"source": "chexnet.pdf"}, limit=1, contains="0.999")
     result = nodes.grade({
-        "question": "How does the way ReAct retrieves information differ from the way RAG retrieves it?",
-        "documents": react_actions,
+        "question": "How do the Adam optimizer settings of CheXNet and the Transformer differ?",
+        "documents": chexnet_adam,
     })
-    assert [d.id for d in result["documents"]] == [react_actions[0].id]
-    assert result["sufficient"] is False  # the RAG side is still missing
+    assert [d.id for d in result["documents"]] == [chexnet_adam[0].id]
+    assert result["sufficient"] is False  # the Transformer side is still missing
 
 
 # ------------------------------------------------- retrieve (real search) ---
 
 @needs_api
 def test_retry_searches_new_chunks_not_the_same_ones():
-    first = nodes.retrieve({"question": CRAG_QUESTION})
-    second = nodes.retrieve({"question": CRAG_QUESTION, "documents": [],
+    first = nodes.retrieve({"question": DEMO_QUESTION})
+    second = nodes.retrieve({"question": DEMO_QUESTION, "documents": [],
                              "seen_ids": first["seen_ids"]})
     assert not {d.id for d in first["documents"]} & {d.id for d in second["documents"]}
     assert len(second["documents"]) == 4
@@ -119,5 +111,5 @@ def test_decide_after_grade(sufficient, attempts, expected):
 
 
 def test_generate_skips_llm_when_nothing_relevant():
-    result = nodes.generate({"question": CRAG_QUESTION, "documents": []})
+    result = nodes.generate({"question": DEMO_QUESTION, "documents": []})
     assert result == {"answer": nodes.IDK, "sources": [], "citations": []}

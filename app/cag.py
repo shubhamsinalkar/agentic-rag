@@ -31,22 +31,24 @@ from app.nodes import IDK, llm, structured
 # Frozen corpus, so a hand-written catalog is fine. The selector reads only
 # these lines, never the papers, so the choice costs ~300 tokens.
 PAPERS = {
-    "rag_lewis2020.pdf": "RAG (Lewis et al. 2020): the original retrieval-"
-                         "augmented generation; DPR retriever + BART generator, "
-                         "RAG-Sequence vs RAG-Token, Wikipedia index.",
-    "self_rag.pdf": "Self-RAG: an LM that decides when to retrieve and critiques "
-                    "itself with reflection tokens; critic model, Llama2.",
-    "corrective_rag.pdf": "Corrective RAG (CRAG): a retrieval evaluator scores "
-                          "documents and triggers Correct/Incorrect/Ambiguous "
-                          "actions, web search, knowledge refinement.",
-    "adaptive_rag.pdf": "Adaptive-RAG: a classifier routes each query to no-"
-                        "retrieval, single-step or multi-step retrieval by "
-                        "query complexity.",
-    "lost_in_the_middle.pdf": "Lost in the Middle: how LMs use long contexts; "
-                              "accuracy is U-shaped in the position of the "
-                              "relevant information.",
-    "react.pdf": "ReAct: LLM agents that interleave reasoning traces and actions "
-                 "(Wikipedia API, HotpotQA, FEVER, ALFWorld, WebShop).",
+    "chexnet.pdf": "CheXNet (medicine): a 121-layer DenseNet that detects "
+                   "pneumonia and 13 other diseases on chest X-rays "
+                   "(ChestX-ray14), compared against four radiologists.",
+    "four_degrees.pdf": "Four Degrees of Separation (social networks): average "
+                        "distance between Facebook users (721M users), Milgram's "
+                        "small-world experiment, HyperANF, spid.",
+    "generative_ai_at_work.pdf": "Generative AI at Work (economics): a GPT-based "
+                                 "assistant for 5,000+ customer support agents; "
+                                 "productivity, worker skill, learning, attrition.",
+    "gravitational_waves.pdf": "Observation of Gravitational Waves (physics): "
+                               "LIGO's first detection, GW150914, a binary black "
+                               "hole merger; detectors, masses, significance.",
+    "planet_nine.pdf": "Evidence for a Distant Giant Planet (astronomy): clustered "
+                       "orbits of distant Kuiper belt objects explained by a "
+                       "~10 Earth-mass planet (Planet Nine).",
+    "transformer.pdf": "Attention Is All You Need (computer science): the "
+                       "Transformer, multi-head self-attention, positional "
+                       "encoding, machine translation BLEU results.",
 }
 
 # 2 papers ~ 30-55k tokens: enough for comparison questions, still fast.

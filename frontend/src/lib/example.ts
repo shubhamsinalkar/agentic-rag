@@ -1,67 +1,74 @@
-// A real response from POST /ask (agentic RAG), captured 2026-10-22.
+// A real response from POST /ask (agentic RAG), captured 2026-11-17.
 // Shown before the first question so visitors see a full run without waiting.
 import type { AskResponse } from './api'
 
-export const EXAMPLE_QUESTION = "How does CRAG decide a retrieved document is incorrect?"
+export const EXAMPLE_QUESTION = "How do the Adam optimizer settings of CheXNet and the Transformer differ?"
 
 export const EXAMPLE: AskResponse = {
-  "answer": "Based on the provided document, CRAG assumes a retrieval is incorrect when the confidence scores of all retrieved documents are below the lower threshold [1].",
+  "answer": "Based on the provided documents, the Adam optimizer settings differ in their parameters:\n\n* **CheXNet** uses standard parameters for the Adam optimizer: $\\beta_1 = 0.9$ and $\\beta_2 = 0.999$ [1].\n* **The Transformer** uses the Adam optimizer with $\\beta_1 = 0.9$, $\\beta_2 = 0.98$, and $\\epsilon = 10^{-9}$ [2].",
   "sources": [
-    "corrective_rag.pdf p.5"
+    "chexnet.pdf p.2",
+    "transformer.pdf p.7"
   ],
   "strategy": "agentic_rag",
-  "route": "conceptual",
+  "route": "comparison",
   "retries": 1,
-  "latency_s": 20.05,
+  "latency_s": 6.83,
   "steps": [
     {
       "step": "route",
-      "label": "conceptual",
-      "ms": 70
+      "label": "comparison",
+      "ms": 13
     },
     {
       "step": "search",
-      "query": "How does CRAG decide a retrieved document is incorrect?",
-      "found": 4,
-      "ms": 5
+      "query": "How do the Adam optimizer settings of CheXNet and the Transformer differ?",
+      "found": 8,
+      "ms": 10
     },
     {
       "step": "check",
       "sufficient": false,
-      "relevant": 1,
-      "missing": "The chunks mention that a retrieval evaluator estimates a relevance score and quantifies it into confidence degrees to trigger the Incorrect action, but they do not state the exact threshold values or the specific criteria/rules used to classify a document as incorrect.",
-      "ms": 5692
+      "relevant": 2,
+      "missing": "The provided text contains information about CheXNet's Adam optimizer settings, but lacks any information regarding the Transformer's Adam optimizer settings.",
+      "ms": 1932
     },
     {
       "step": "rewrite",
-      "query": "Corrective Retrieval-Augmented Generation retrieval evaluator confidence scores thresholds classification rules incorrect action",
-      "ms": 3388
+      "query": "We trained the transformer model using the Adam optimizer with $\\beta_1 = 0.9$, $\\beta_2 = 0.98$ and $\\epsilon = 10^{-9}$",
+      "ms": 684
     },
     {
       "step": "search",
-      "query": "Corrective Retrieval-Augmented Generation retrieval evaluator confidence scores thresholds classification rules incorrect action",
-      "found": 4,
-      "ms": 831
+      "query": "We trained the transformer model using the Adam optimizer with $\\beta_1 = 0.9$, $\\beta_2 = 0.98$ and $\\epsilon = 10^{-9}$",
+      "found": 8,
+      "ms": 594
     },
     {
       "step": "check",
       "sufficient": true,
-      "relevant": 1,
+      "relevant": 2,
       "missing": "",
-      "ms": 4896
+      "ms": 2132
     },
     {
       "step": "answer",
-      "cited": 1,
-      "ms": 5163
+      "cited": 2,
+      "ms": 1470
     }
   ],
   "citations": [
     {
       "n": 1,
-      "source": "corrective_rag.pdf",
-      "page": 5,
-      "text": "when the confidence score of at least one retrieved document is higher than the upper threshold. If so, it means that there are relevant documents in the retrieved results, and the knowledge from the retrieval results is supposed to be more reliable and accurate. However, even if a relevant document can be found, there is inevitably some noisy knowledge strips in this document. To extract the most critical knowledge strips within this document, a knowledge refinement method is further designed which will be elaborated in Section 4.4. Incorrect Besides, a retrieval is assumed Incorrect when the confidence scores of all retrieved documents are below the lower threshold. This indicates that all retrieved documents are considered irrelevant, which are unhelpful for generation. Once the knowledge from the retrieval results is judged to be inaccurate, it is unwise to still get stuck in it, which is likely to result in fabricated facts. Therefore, we need to seek new"
+      "source": "chexnet.pdf",
+      "page": 2,
+      "text": "−w−· (1−y) logp(Y = 0|X), where p(Y =i|X) is the probability that the network assigns to the labeli,w+ =|N|/(|P|+|N|), andw− = |P|/(|P|+|N|) with|P| and|N| the number of positive cases and negative cases of pneumonia in the training set respectively. 2.2. Model Architecture and T raining CheXNet is a 121-layer Dense Convolutional Net- work (DenseNet) (Huang et al., 2016) trained on the ChestX-ray 14 dataset. DenseNets improve ﬂow of in- formation and gradients through the network, making the optimization of very deep networks tractable. We replace the ﬁnal fully connected layer with one that has a single output, after which we apply a sigmoid nonlinearity. The weights of the network are initialized with weights from a model pretrained on ImageNet (Deng et al., 2009). The network is trained end-to-end using Adam with standard parameters (β1 = 0.9 and β2 = 0.999) (Kingma & Ba, 2014). We train the model using mini- batches of size 16. We use an initial learning rate of"
+    },
+    {
+      "n": 2,
+      "source": "transformer.pdf",
+      "page": 7,
+      "text": "We trained our models on one machine with 8 NVIDIA P100 GPUs. For our base models using the hyperparameters described throughout the paper, each training step took about 0.4 seconds. We trained the base models for a total of 100,000 steps or 12 hours. For our big models,(described on the bottom line of table 3), step time was 1.0 seconds. The big models were trained for 300,000 steps (3.5 days). 5.3 Optimizer We used the Adam optimizer [20] with β1 = 0.9, β2 = 0.98 and ϵ = 10−9. We varied the learning rate over the course of training, according to the formula: lrate = d−0.5model · min(step_num−0.5, step_num · warmup_steps−1.5) (3) This corresponds to increasing the learning rate linearly for the first warmup_steps training steps, and decreasing it thereafter proportionally to the inverse square root of the step number. We used warmup_steps = 4000. 5.4 Regularization We employ three types of regularization during training: 7"
     }
   ]
 }

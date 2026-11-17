@@ -1,124 +1,124 @@
 question,label
-"Which datasets does Self-RAG evaluate on?",factual
-"What beam width does Self-RAG use at the segment level?",factual
-"How many documents does Self-RAG retrieve per input by default?",factual
-"What learning rate was used to train the Adaptive-RAG classifier?",factual
-"Which GPU did the CRAG authors use for their experiments?",factual
-"How much memory does LLaMA-2 7B take during CRAG inference?",factual
-"What web search API does CRAG use?",factual
-"Who are the authors of the CRAG paper?",factual
-"Which university is the CRAG paper from?",factual
-"What year was the RAG paper published?",factual
-"What is the dimension of the document vectors in RAG's index?",factual
-"How many total values are stored in RAG's non-parametric memory?",factual
-"What beam size does RAG use for decoding?",factual
-"Which open-domain QA datasets does RAG report results on?",factual
-"What exact match score does RAG get on Natural Questions?",factual
-"What is the exact match of ReAct on HotpotQA?",factual
-"What accuracy does ReAct reach on FEVER?",factual
-"How many in-context examples does ReAct use for ALFWorld?",factual
-"Which models are evaluated in Lost in the Middle?",factual
-"What is the context length of LongChat-13B?",factual
-"How many documents are in the input context in the Lost in the Middle experiments?",factual
-"What is Claude-1.3's oracle accuracy in Lost in the Middle?",factual
-"Which retriever supplies documents in the Lost in the Middle experiments?",factual
-"What dataset is the multi-document QA task built from?",factual
-"How many key-value pairs are used in the synthetic retrieval task?",factual
-"Which LLMs does Adaptive-RAG test with?",factual
-"How many test samples per dataset does Adaptive-RAG use?",factual
-"What is the F1 score of Adaptive-RAG with GPT-3.5?",factual
-"Which base model does the Self-RAG critic use?",factual
-"How many reflection token types does Self-RAG define?",factual
-"what dataset size was used to train the critic in self-rag",factual
-"Name the benchmarks used in the ReAct paper",factual
-"Which optimizer is used to train the Adaptive-RAG classifier?",factual
-"What threshold values does CRAG use for its retrieval evaluator?",factual
-"Which version of SQuAD does Adaptive-RAG use?",factual
-"What does the acronym CRAG stand for?",factual
-"what is the full name of ReAct",factual
-"Which conference published the ReAct paper?",factual
-"How many CoT-SC samples are drawn in the ReAct experiments?",factual
-"What metric does Self-RAG report for PopQA?",factual
-"Which dataset is used to fine-tune CRAG's retrieval evaluator?",factual
-"How many retrieved documents does RAG use for Jeopardy question generation?",factual
-"What is GPT-3.5-Turbo's accuracy with 20 documents when the answer is in the middle?",factual
-"Which model rewrites queries for web search in CRAG?",factual
-"How many queries were annotated to train the Adaptive-RAG classifier?",factual
-"How does Self-RAG decide when to retrieve?",conceptual
-"Why does CRAG use web search?",conceptual
-"Explain the decompose-then-recompose algorithm in CRAG.",conceptual
-"How does knowledge refinement filter out irrelevant strips?",conceptual
-"Why is a lightweight evaluator preferred in CRAG?",conceptual
-"How does RAG marginalize over the retrieved documents?",conceptual
-"Explain how dense passage retrieval works in RAG.",conceptual
-"Why can RAG update its knowledge without retraining?",conceptual
-"What is index hot-swapping and why is it useful?",conceptual
-"How does ReAct combine reasoning and acting?",conceptual
-"Why does chain-of-thought hallucinate more than ReAct?",conceptual
-"How does ReAct recover from mistakes in its reasoning?",conceptual
-"Why do models do worse when relevant information is in the middle of the context?",conceptual
-"How does model architecture affect position bias in Lost in the Middle?",conceptual
-"Explain query-aware contextualization.",conceptual
-"Why don't extended-context models fix the lost in the middle problem?",conceptual
-"How does instruction fine-tuning affect the U-shaped curve?",conceptual
-"What is the purpose of the ISUSE token?",conceptual
-"How does Self-RAG use reflection tokens at inference time to rank outputs?",conceptual
-"Explain how the critic model is trained in Self-RAG.",conceptual
-"Why does Self-RAG train on passages interleaved with reflection tokens?",conceptual
-"How does Adaptive-RAG save time on simple questions?",conceptual
-"Why is multi-step retrieval inefficient for simple queries?",conceptual
-"How does the iterative approach answer complex multi-hop questions?",conceptual
-"What is the role of the query-complexity classifier?",conceptual
-"Why does retrieval sometimes hurt generation quality?",conceptual
-"How does CRAG handle ambiguous retrieval results?",conceptual
-"Explain the Correct action in CRAG",conceptual
-"Why does CRAG rewrite queries before searching the web?",conceptual
-"How does the retrieval evaluator compute a confidence score?",conceptual
-"Explain why RAG-Token can combine information from several documents.",conceptual
-"How is the RAG retriever trained without supervision on which document to retrieve?",conceptual
-"What causes retrieval collapse in RAG?",conceptual
-"How do the thoughts in ReAct help in decision-making tasks like ALFWorld?",conceptual
-"Why is ReAct more interpretable than acting alone?",conceptual
-"what problem does self-rag try to solve",conceptual
-"explain the motivation behind corrective retrieval augmented generation",conceptual
-"How does Self-RAG check that its output is supported by evidence?",conceptual
-"Why does adding more retrieved documents give diminishing returns?",conceptual
-"How does the position of the answer document change model accuracy?",conceptual
-"Describe how ReAct's action space limits its retrieval.",conceptual
-"Why does Adaptive-RAG label queries automatically instead of by hand?",conceptual
-"How does the generator in Self-RAG learn to predict reflection tokens?",conceptual
-"Why is BART a good fit as the generator in RAG?",conceptual
-"How does Self-RAG's critic make training cheaper than RLHF?",conceptual
-"Compare CRAG and RAG in how they use retrieved documents.",comparison
-"What is the difference between Self-RAG and CRAG?",comparison
-"ReAct vs chain-of-thought: which is more factual?",comparison
-"How does Adaptive-RAG differ from Self-RAG?",comparison
-"Compare single-step and multi-step retrieval approaches.",comparison
-"Which is better on HotpotQA, ReAct or CoT-SC?",comparison
-"Differences between RAG-Sequence and Self-RAG?",comparison
-"How do encoder-decoder and decoder-only models compare in Lost in the Middle?",comparison
-"Compare GPT-3.5-Turbo and Claude-1.3 on the multi-document QA task.",comparison
-"CRAG versus Self-RAG on PopQA performance",comparison
-"Contrast the retrievers used by CRAG and Adaptive-RAG.",comparison
-"How does ReAct's use of Wikipedia compare to RAG's?",comparison
-"Compare the critic in Self-RAG with the evaluator in CRAG.",comparison
-"Which needs more training, Self-RAG or CRAG?",comparison
-"What do CRAG and Adaptive-RAG have in common?",comparison
-"Compare how Lost in the Middle and Adaptive-RAG view retrieving more documents.",comparison
-"ReAct vs Act-only: how do the results differ?",comparison
-"Compare closed-book and oracle performance in Lost in the Middle.",comparison
-"How do RAG and REALM differ in updating the document encoder?",comparison
-"Compare extended-context models with their standard versions.",comparison
-"Which papers use T5 models and for what?",comparison
-"Both CRAG and Self-RAG critique retrieval: how are they similar and different?",comparison
-"Is Adaptive-RAG faster than Self-RAG?",comparison
-"Compare the datasets used by Self-RAG and CRAG.",comparison
-"difference between no-retrieval, single-step and multi-step approaches in adaptive rag",comparison
-"How does CRAG improve on Self-RAG?",comparison
-"Compare primacy bias and recency bias.",comparison
-"RAG vs purely parametric models: what does the RAG paper find?",comparison
-"Which handles irrelevant documents better, CRAG or standard RAG?",comparison
-"Compare the base LLMs used in Self-RAG, CRAG and Adaptive-RAG.",comparison
+"How many layers does CheXNet have?",factual
+"What dataset is CheXNet trained on?",factual
+"How many images are in the ChestX-ray14 dataset?",factual
+"What image size does CheXNet resize X-rays to?",factual
+"What batch size was used to train CheXNet?",factual
+"What learning rate does CheXNet start with?",factual
+"How many diseases does ChestX-ray14 label?",factual
+"What AUROC does CheXNet get for pneumonia?",factual
+"How many years of experience did the CheXNet radiologists have?",factual
+"How many patients are in the CheXNet test set?",factual
+"When was GW150914 detected?",factual
+"What was the peak strain of the gravitational wave signal?",factual
+"How far away was the black hole merger?",factual
+"What was the signal-to-noise ratio of GW150914?",factual
+"How long are the arms of the LIGO detectors?",factual
+"Which detector saw the signal first, Hanford or Livingston?",factual
+"What was the mass of the final black hole?",factual
+"How much energy was radiated in gravitational waves?",factual
+"What frequency range did the signal sweep through?",factual
+"How much laser power circulates in each LIGO arm cavity?",factual
+"What mass do Batygin and Brown estimate for the distant planet?",factual
+"What semi-major axis was used for the planet in the simulations?",factual
+"What eccentricity does the proposed planet have?",factual
+"How many distant Kuiper belt objects are clustered?",factual
+"What is the probability that the orbital clustering is due to chance?",factual
+"Which objects beyond 250 AU show clustering?",factual
+"How many customer support agents were studied in Generative AI at Work?",factual
+"By how much did AI assistance raise productivity?",factual
+"Where do most of the customer support agents work?",factual
+"How long is an average customer support chat?",factual
+"Which language model is the AI assistant built on?",factual
+"How much did the least skilled workers improve with AI?",factual
+"How many users did the Facebook graph have?",factual
+"How many friendship links were in the Facebook graph?",factual
+"What is the average distance in the Facebook graph?",factual
+"What is the spid of the Facebook graph?",factual
+"What tool was used to compute the distance distribution?",factual
+"What percentage of Facebook pairs are within distance five?",factual
+"How many intermediaries did Milgram find on average?",factual
+"What BLEU score does the Transformer get on English-German?",factual
+"How many attention heads does the Transformer use?",factual
+"How many layers are in the Transformer encoder?",factual
+"How long did the big Transformer take to train?",factual
+"What value of label smoothing does the Transformer use?",factual
+"What is the warmup steps value in the Transformer learning rate schedule?",factual
+"How does CheXNet localize the disease in the X-ray?",conceptual
+"Why does CheXNet use a weighted loss function?",conceptual
+"How did the authors test whether CheXNet beats radiologists significantly?",conceptual
+"Why is detecting pneumonia on chest X-rays hard for radiologists?",conceptual
+"How was CheXNet extended to detect all 14 diseases?",conceptual
+"What are the limitations of the CheXNet comparison with radiologists?",conceptual
+"Why do DenseNets make training very deep networks possible?",conceptual
+"How does LIGO measure a gravitational wave?",conceptual
+"Why must the source of GW150914 be two black holes?",conceptual
+"How did LIGO estimate the false alarm rate of the event?",conceptual
+"Why are two widely separated detectors needed?",conceptual
+"How does the power recycling mirror improve sensitivity?",conceptual
+"What does the chirp mass tell us about the binary?",conceptual
+"How does the signal change as the black holes spiral together?",conceptual
+"Why is the clustering of distant Kuiper belt objects surprising?",conceptual
+"How can a distant planet keep the orbits of Kuiper belt objects aligned?",conceptual
+"How did Batygin and Brown estimate the significance of the clustering?",conceptual
+"Why did the authors rule out the Kozai mechanism explanation?",conceptual
+"How does the proposed planet explain Sedna-like objects?",conceptual
+"How could astronomers test the Planet Nine hypothesis?",conceptual
+"Why do less experienced agents benefit more from AI assistance?",conceptual
+"How does AI assistance help workers learn?",conceptual
+"How did the authors use software outages in their analysis?",conceptual
+"Why are AI gains largest for rare problems?",conceptual
+"How does AI assistance change how customers treat agents?",conceptual
+"Why might top workers' quality decline with AI suggestions?",conceptual
+"How does the AI assistant work during customer chats?",conceptual
+"How does AI change worker attrition?",conceptual
+"Why is the Facebook graph a good test of six degrees of separation?",conceptual
+"How does HyperANF estimate the distance distribution?",conceptual
+"Why is Milgram's measurement an upper bound on average distance?",conceptual
+"Why does the average distance shrink as Facebook grows?",conceptual
+"How does geography affect the average distance between users?",conceptual
+"What does the spid measure and why does it matter?",conceptual
+"Why does the Transformer avoid recurrence?",conceptual
+"How does multi-head attention work?",conceptual
+"Why are dot products scaled by the square root of dk?",conceptual
+"How does the Transformer know the order of words?",conceptual
+"Why is self-attention faster than recurrent layers?",conceptual
+"How does the learning rate schedule of the Transformer work?",conceptual
+"What is the role of residual connections in the Transformer?",conceptual
+"How does masking work in the Transformer decoder?",conceptual
+"Explain the encoder-decoder structure of the Transformer.",conceptual
+"Why does label smoothing improve BLEU in the Transformer?",conceptual
+"How does the Transformer use positional encoding?",conceptual
+"Compare CheXNet's F1 score with the average radiologist.",comparison
+"How does CheXNet compare with previous work on ChestX-ray14?",comparison
+"Compare the optimizer settings of CheXNet and the Transformer.",comparison
+"Compare the significance of the LIGO detection and the Planet Nine clustering.",comparison
+"How did Milgram's experiment differ from the Facebook study?",comparison
+"Compare the average distance in the Italian and Facebook graphs.",comparison
+"How do less skilled and highly skilled agents differ in AI gains?",comparison
+"Compare productivity before and after AI assistance.",comparison
+"How does the Transformer compare with recurrent models?",comparison
+"Compare the base and big Transformer models.",comparison
+"Compare additive attention and dot-product attention.",comparison
+"How do sinusoidal and learned positional embeddings compare?",comparison
+"How does the Planet Nine hypothesis differ from the inclination instability idea?",comparison
+"Compare the Kozai mechanism and the distant planet explanation.",comparison
+"Compare the masses of the two black holes in GW150914.",comparison
+"How do the Hanford and Livingston signals differ?",comparison
+"Compare how CheXNet and the AI assistant compare AI with human experts.",comparison
+"Which used more data, CheXNet or the Transformer?",comparison
+"Compare the dataset sizes in the Facebook study and the customer support study.",comparison
+"How does AI assistance affect experienced versus new agents?",comparison
+"Compare chats per hour and average handle time results.",comparison
+"Compare the 2008 and current Facebook average distances.",comparison
+"CheXNet vs radiologists: who performs better?",comparison
+"Transformer vs convolutional sequence models: which trains faster?",comparison
+"How does the US Facebook graph compare to the global graph?",comparison
+"Compare the binary coalescence search and the generic transient search.",comparison
+"Compare the gravitational wave detection with the binary pulsar evidence.",comparison
+"How do the training costs of the Transformer compare with earlier models?",comparison
+"Compare the stable and unstable Kuiper belt objects.",comparison
+"Compare English-German and English-French results of the Transformer.",comparison
 "What is the capital of France?",off_topic
 "Who won the last cricket world cup?",off_topic
 "How do I make pancakes?",off_topic
@@ -131,21 +131,21 @@ question,label
 "How many calories are in a banana?",off_topic
 "Translate hello into Spanish.",off_topic
 "What is the stock price of Apple?",off_topic
-"How do convolutional neural networks work?",off_topic
-"What is LoRA fine-tuning?",off_topic
-"Explain gradient descent.",off_topic
+"What is a good recipe for biryani?",off_topic
+"How do I open a bank account?",off_topic
+"How do I change a car tyre?",off_topic
 "How do I deploy a React app to Vercel?",off_topic
-"What is the speed of light?",off_topic
+"What time does the shop close?",off_topic
 "Tell me a joke.",off_topic
 "How do I fix a flat bicycle tire?",off_topic
 "What is the plot of Harry Potter?",off_topic
 "When was the Eiffel Tower built?",off_topic
 "How tall is Mount Everest?",off_topic
-"What are the symptoms of the flu?",off_topic
+"How do I grow tomatoes at home?",off_topic
 "How do I learn to play guitar?",off_topic
 "What is Docker used for?",off_topic
 "Who painted the Mona Lisa?",off_topic
 "What is the difference between SQL and NoSQL?",off_topic
 "Compare iPhone and Android phones.",off_topic
-"How does photosynthesis work?",off_topic
+"How do I write a good resume?",off_topic
 "Which programming language should I learn first?",off_topic

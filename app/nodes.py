@@ -71,7 +71,10 @@ GRADE_PROMPT = ChatPromptTemplate.from_messages([
 REWRITE_PROMPT = ChatPromptTemplate.from_messages([
     ("system",
      "You write search queries for a semantic (vector) search over research "
-     "papers about retrieval-augmented generation and LLM agents. "
+     "papers from several fields: medical imaging (CheXNet), social networks "
+     "(Facebook's degrees of separation), economics (generative AI at work), "
+     "physics (LIGO gravitational waves), astronomy (Planet Nine) and "
+     "computer science (the Transformer). "
      "Vector search matches meaning, so phrase the query the way the paper "
      "text itself would state the answer, using specific technical terms. "
      "Return ONLY the new query, nothing else."),
@@ -230,7 +233,7 @@ def retrieve(state: State) -> dict:
 
     Without the skip, summary-like chunks (abstract, intro, conclusion)
     win every search, and each retry re-grades the same 4 chunks. Tested:
-    the CRAG "Action Trigger" chunk ranked #8 and was never reached.
+    a key chunk could rank #8 and never be reached.
 
     Chunks judged relevant earlier stay in `documents`, so a retry can only
     add evidence, never lose it.

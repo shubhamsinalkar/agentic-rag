@@ -30,7 +30,7 @@ def test_catches_obvious_off_topic(question):
 
 
 def test_recognises_a_comparison():
-    assert router.predict("Compare how Self-RAG and Adaptive-RAG decide to retrieve.") == "comparison"
+    assert router.predict("Compare how CheXNet and the Transformer are trained.") == "comparison"
 
 
 @pytest.mark.parametrize("proba, expected", [

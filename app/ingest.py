@@ -1,7 +1,7 @@
 """PDF -> page Documents -> chunks -> embeddings -> Chroma on disk.
 
 Rebuild from the shipped vectors (free):  .venv\\Scripts\\python -m app.ingest --from-export
-Rebuild by calling the API (635 requests): .venv\\Scripts\\python -m app.ingest
+Rebuild by calling the API (641 requests): .venv\\Scripts\\python -m app.ingest
 Search it:  .venv\\Scripts\\python -m app.ingest --search "your question"
 """
 
@@ -129,7 +129,7 @@ def get_vectorstore() -> Chroma:
 
 
 def chunk_id(doc: Document) -> str:
-    """Stable id, e.g. "react.pdf:4:812" (paper, page, character offset).
+    """Stable id, e.g. "chexnet.pdf:4:812" (paper, page, character offset).
 
     The same chunk gets the same id on every machine, which is what lets a
     saved index be matched back to freshly split PDFs.
@@ -149,7 +149,7 @@ def build_index() -> None:
     The corpus is frozen and small, so a full rebuild is simpler than tracking
     which chunks changed.
 
-    Cost: one embedding request PER CHUNK. 635 chunks use 635 of the free
+    Cost: one embedding request PER CHUNK. 641 chunks use 641 of the free
     tier's 1,000 requests per day, so don't rebuild casually: deployments
     use build_from_export() instead, which costs nothing.
     """

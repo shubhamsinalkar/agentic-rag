@@ -1,8 +1,9 @@
 """The frozen corpus: six arXiv papers, pinned to exact versions.
 
-The PDFs are NOT in the repository: three of them (RAG, CRAG, Lost in the
-Middle) carry arXiv's standard license, which lets arXiv distribute them
-but not us. Anyone (and the Render build) fetches them from arXiv instead:
+The PDFs are NOT in the repository: four of them (CheXNet, Four Degrees,
+Planet Nine, Transformer) carry arXiv's standard license, which lets arXiv
+distribute them but not us. Anyone (and the Render build) fetches them from
+arXiv instead:
 
     .venv\\Scripts\\python -m app.corpus
 
@@ -28,19 +29,21 @@ class Paper:
     license: str
 
 
+# Six readable papers from six different fields. None is about RAG, so the
+# corpus can't be confused with the system that searches it.
 CORPUS = [
-    Paper("adaptive_rag.pdf", "2403.14403v2",
-          "12d262c682626c26a98bdafc7ec5dc6af3fae8247d26d4f2c712b1599dafce62", "CC0 1.0"),
-    Paper("corrective_rag.pdf", "2401.15884v3",
-          "975aa1fd3c1b603126e93ff99d6504858b61301bf1d34c9df88ebe53a0b026cb", "arXiv non-exclusive"),
-    Paper("lost_in_the_middle.pdf", "2307.03172v3",
-          "653b29619eae2ae4b361d7bdcdc06db4bedcb1b0eabe31814036beca8c1af0b1", "arXiv non-exclusive"),
-    Paper("rag_lewis2020.pdf", "2005.11401v4",
-          "23e3249e9a1e75418d82efecab0ea8c4d033b89c93742f63208d47ce01f21233", "arXiv non-exclusive"),
-    Paper("react.pdf", "2210.03629v3",
-          "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69", "CC BY 4.0"),
-    Paper("self_rag.pdf", "2310.11511v1",
-          "d9eaa1398abac0df67a9d0933a5bf8b6d9d83d2e72da2a486073cd842dd52978", "CC BY 4.0"),
+    Paper("chexnet.pdf", "1711.05225v3",              # medicine
+          "3419d5eb50b8f33f41f2d47d0e727c6933a4918d36b861968e6c3854138d86be", "arXiv non-exclusive"),
+    Paper("four_degrees.pdf", "1111.4570v3",          # social networks
+          "d6580859cf0a6130b247337e52e6c66f596149674d5cbfbb6758aab258b7187d", "arXiv non-exclusive"),
+    Paper("generative_ai_at_work.pdf", "2304.11771v2",  # economics
+          "146dcc7459824f0f1fe4a1f9ac7e8be06ee098b8b34e686a75131b77e42ce951", "CC BY-NC-ND 4.0"),
+    Paper("gravitational_waves.pdf", "1602.03837v1",  # physics
+          "e5e864c23d015b69be17e5b5d51b5b462d2829353a867513414b6728f54589c4", "CC BY 4.0"),
+    Paper("planet_nine.pdf", "1601.05438v1",          # astronomy
+          "23c08971aa86ee16d32fca1be7c48d2e70ffd7974d58a012abf0c1f7c42ce059", "arXiv non-exclusive"),
+    Paper("transformer.pdf", "1706.03762v7",          # computer science
+          "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697", "arXiv non-exclusive"),
 ]
 
 # arXiv asks automated clients to wait between requests.
